@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+sqlmodel
+alembic
+pydantic_settings
+python-dotenv
