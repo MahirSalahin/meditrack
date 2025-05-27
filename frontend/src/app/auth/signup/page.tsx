@@ -57,7 +57,7 @@ export default function SignUpPage() {
       toast.success("Account created successfully!")
       router.push("/auth/signin")
     } catch (error) {
-      toast.error("Failed to create account")
+      toast.error(JSON.stringify(error) || "An error occurred during registration")
     } finally {
       setIsLoading(false)
     }

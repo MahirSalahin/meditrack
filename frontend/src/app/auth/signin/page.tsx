@@ -38,7 +38,7 @@ export default function SignInPage() {
       toast.success("Signed in successfully!")
       router.push(`/${formData.userType}/dashboard`)
     } catch (error) {
-      toast.error("Invalid email or password")
+      toast.error(JSON.stringify(error) || "An error occurred while signing in")
     } finally {
       setIsLoading(false)
     }

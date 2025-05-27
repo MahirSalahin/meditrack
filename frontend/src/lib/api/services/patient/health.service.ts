@@ -47,13 +47,6 @@ const getHealthHistoryData = async (metricId: string): Promise<{ date: string; v
 }
 
 // Query hooks
-export const useHealthMetrics = () => {
-    return useQuery({
-        queryKey: ["health-metrics"],
-        queryFn: getHealthMetricsData,
-    })
-}
-
 export const useHealthHistory = (metricId: string) => {
     return useQuery({
         queryKey: ["health-history", metricId],
