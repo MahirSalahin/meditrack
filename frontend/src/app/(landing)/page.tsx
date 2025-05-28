@@ -18,13 +18,8 @@ export default function LandingPage() {
               <span className="text-xl font-bold text-gray-900">MediTrack</span>
             </div>
             <div className="flex items-center space-x-4">
-              <Link href="/auth/signin">
-                <Button variant="ghost" className="text-gray-600 hover:text-gray-900">
-                  Sign In
-                </Button>
-              </Link>
-              <Link href="/auth/signup">
-                <Button className="bg-blue-600 text-white hover:bg-blue-700">Get Started</Button>
+              <Link href="/auth">
+                <Button className="bg-blue-600 text-white hover:bg-blue-700">Join</Button>
               </Link>
             </div>
           </div>
