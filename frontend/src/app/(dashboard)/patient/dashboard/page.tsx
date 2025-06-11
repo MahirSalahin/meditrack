@@ -3,36 +3,30 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Pill, Activity, Plus, Clock, TrendingUp, Heart, Thermometer } from "lucide-react"
-import {
-  useHealthMetrics,
-  usePatientAppointments,
-  usePatientMedications,
-  usePatientDashboardStats,
-} from "@/lib/api/services/patient/dashboard.service"
-import {
-  StatsCardSkeleton,
-  HealthMetricSkeleton,
-  AppointmentCardSkeleton,
-  MedicationCardSkeleton,
-} from "@/components/skeletons/patient/dashboard.skeleton"
+import { Calendar, Pill, FileText, Activity, Plus, Clock, ArrowRight, Eye } from "lucide-react"
+import { usePatientAppointments, usePatientMedications } from "@/lib/api/services/patient/dashboard.service"
+import { usePatientPrescriptions } from "@/lib/api/services/patient/prescriptions.service"
+import { useTestReports } from "@/lib/api/services/patient/reports.service"
+import Link from "next/link"
 
 export default function PatientDashboard() {
-  const { data: healthMetrics, isLoading: healthLoading } = useHealthMetrics()
   const { data: appointments, isLoading: appointmentsLoading } = usePatientAppointments()
   const { data: medications, isLoading: medicationsLoading } = usePatientMedications()
-  const { data: stats, isLoading: statsLoading } = usePatientDashboardStats()
+  const { data: prescriptions, isLoading: prescriptionsLoading } = usePatientPrescriptions()
+  const { data: reports, isLoading: reportsLoading } = useTestReports()
 
-  const getIcon = (iconName: string) => {
-    switch (iconName) {
-      case "Heart":
-        return Heart
-      case "Activity":
-        return Activity
-      case "Thermometer":
-        return Thermometer
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active":
+        return "bg-green-100 text-green-800"
+      case "pending":
+        return "bg-yellow-100 text-yellow-800"
+      case "scheduled":
+        return "bg-blue-100 text-blue-800"
+      case "completed":
+        return "bg-gray-100 text-gray-800"
       default:
-        return Activity
+        return "bg-gray-100 text-gray-800"
     }
   }
 
@@ -42,208 +36,240 @@ export default function PatientDashboard() {
       <div className={`bg-primary rounded-2xl p-8 text-white relative overflow-hidden`}>
         <div className="relative z-10">
           <h1 className="text-3xl font-bold mb-2">Welcome back 👋</h1>
-          <h2 className="text-2xl font-semibold mb-4">John Doe</h2>
-          <p className="text-white/80 text-lg mb-6 max-w-md">
-            If you are going to use a passage of Lorem Ipsum, you need to be sure there isn&#39;t anything.
+          <p className="text-primary-foreground/80">
+            Here's an overview of your health information and upcoming activities.
           </p>
-          <Button className="bg-white/20 hover:bg-white/30 text-white border-white/30">Go now</Button>
         </div>
-        <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
-          <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">
-            <Activity className="w-16 h-16 text-white/80" />
-          </div>
-        </div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-8 translate-x-8"></div>
+        <div className="absolute bottom-0 right-8 w-20 h-20 bg-white/5 rounded-full translate-y-4"></div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {statsLoading ? (
-          <>
-            <StatsCardSkeleton />
-            <StatsCardSkeleton />
-            <StatsCardSkeleton />
-          </>
-        ) : (
-          <>
-            <Card className="shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-muted-foreground">Total active users</h3>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-3xl font-bold">{stats?.totalActiveUsers.toLocaleString()}</div>
-                  <div className="flex items-center text-sm">
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                    <span className="text-green-500">{stats?.activeUsersChange}</span>
-                    <span className="text-gray-500 ml-1">last 7 days</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-muted-foreground">Total installed</h3>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-3xl font-bold">{stats?.totalInstalled.toLocaleString()}</div>
-                  <div className="flex items-center text-sm">
-                    <TrendingUp className="h-3 w-3 text-blue-500 mr-1" />
-                    <span className="text-blue-500">{stats?.installedChange}</span>
-                    <span className="text-gray-500 ml-1">last 7 days</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-muted-foreground">Total downloads</h3>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-3xl font-bold">{stats?.totalDownloads}</div>
-                  <div className="flex items-center text-sm">
-                    <span className="text-red-500">{stats?.downloadsChange}</span>
-                    <span className="text-gray-500 ml-1">last 7 days</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </>
-        )}
-      </div>
-
-      {/* Health Metrics */}
-      <Card className="shadow-sm">
-        <CardHeader>
-          <CardTitle>Today&#39;s Health Metrics</CardTitle>
-          <CardDescription>Your latest vital signs and measurements</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-6 md:grid-cols-3">
-            {healthLoading ? (
-              <>
-                <HealthMetricSkeleton />
-                <HealthMetricSkeleton />
-                <HealthMetricSkeleton />
-              </>
-            ) : (
-              healthMetrics?.map((metric) => {
-                const IconComponent = getIcon(metric.icon)
-                return (
-                  <div key={metric.id} className="flex bg-card border items-center space-x-4 p-4 rounded-lg">
-                    <div className="p-3 rounded-full">
-                      <IconComponent className={`h-6 w-6 ${metric.color}`} />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium">{metric.label}</p>
-                      <p className="text-2xl font-bold">
-                        {metric.value} <span className="text-sm font-normal">{metric.unit}</span>
-                      </p>
-                      <Badge variant="secondary" className="text-xs mt-1">
-                        {metric.trend}
-                      </Badge>
-                    </div>
-                  </div>
-                )
-              })
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Upcoming Appointments */}
+      <div className="grid gap-6 md:grid-cols-2">
+        {/* Current Medications */}
         <Card className="shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Upcoming Appointments</CardTitle>
-              <CardDescription>Your scheduled medical appointments</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <div className="flex items-center space-x-2">
+              <Pill className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">Current Medications</CardTitle>
             </div>
-            <Button size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Book New
-            </Button>
+            <Link href="/patient/medications">
+              <Button variant="ghost" size="sm">
+                View All
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {appointmentsLoading ? (
+          <CardContent className="space-y-3">
+            {medicationsLoading ? (
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+              </div>
+            ) : medications && medications.length > 0 ? (
               <>
-                <AppointmentCardSkeleton />
-                <AppointmentCardSkeleton />
-              </>
-            ) : (
-              appointments?.map((appointment) => (
-                <div
-                  key={appointment.id}
-                  className="flex items-center justify-between p-4 rounded-lg"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className={`p-2 rounded-lg bg-primary text-white`}>
-                      <Calendar className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{appointment.doctor}</p>
-                      <p className="text-sm text-muted-foreground">{appointment.specialty}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {appointment.date} at {appointment.time}
+                {medications.slice(0, 3).map((med) => (
+                  <div key={med.id} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="space-y-1">
+                      <p className="font-medium text-sm">{med.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {med.dosage} • {med.frequency}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Next: {med.nextDose}
                       </p>
                     </div>
+                    <Badge variant="outline" className={getStatusColor(med.status)}>
+                      {med.status}
+                    </Badge>
                   </div>
-                  <Button variant="outline" size="sm">
-                    View Details
-                  </Button>
-                </div>
-              ))
+                ))}
+                {medications.length > 3 && (
+                  <p className="text-sm text-muted-foreground text-center pt-2">
+                    +{medications.length - 3} more medications
+                  </p>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <Pill className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No current medications</p>
+              </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Recent Medications */}
+        {/* Upcoming Appointments */}
         <Card className="shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Medication Reminders</CardTitle>
-              <CardDescription>Your current medications and schedules</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <div className="flex items-center space-x-2">
+              <Calendar className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">Upcoming Appointments</CardTitle>
             </div>
-            <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Med
-            </Button>
+            <Link href="/patient/appointments">
+              <Button variant="ghost" size="sm">
+                View All
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {medicationsLoading ? (
+          <CardContent className="space-y-3">
+            {appointmentsLoading ? (
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+              </div>
+            ) : appointments && appointments.length > 0 ? (
               <>
-                <MedicationCardSkeleton />
-                <MedicationCardSkeleton />
+                {appointments.slice(0, 3).map((appointment) => (
+                  <div key={appointment.id} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="space-y-1">
+                      <p className="font-medium text-sm">{appointment.doctorName}</p>
+                      <p className="text-xs text-muted-foreground">{appointment.type}</p>
+                      <div className="flex items-center space-x-2 text-xs text-muted-foreground">
+                        <Clock className="h-3 w-3" />
+                        <span>{appointment.date} at {appointment.time}</span>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className={getStatusColor(appointment.status)}>
+                      {appointment.status}
+                    </Badge>
+                  </div>
+                ))}
+                {appointments.length > 3 && (
+                  <p className="text-sm text-muted-foreground text-center pt-2">
+                    +{appointments.length - 3} more appointments
+                  </p>
+                )}
               </>
             ) : (
-              medications?.map((medication) => (
-                <div
-                  key={medication.id}
-                  className="flex items-center justify-between p-4 rounded-lg"
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="p-2 rounded-lg bg-pink-500 text-white">
-                      <Pill className="h-4 w-4" />
+              <div className="text-center py-4">
+                <Calendar className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No upcoming appointments</p>
+                <Link href="/patient/appointments">
+                  <Button variant="outline" size="sm" className="mt-2">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Book Appointment
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Recent Prescriptions */}
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <div className="flex items-center space-x-2">
+              <FileText className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">Recent Prescriptions</CardTitle>
+            </div>
+            <Link href="/patient/prescriptions">
+              <Button variant="ghost" size="sm">
+                View All
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {prescriptionsLoading ? (
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+              </div>
+            ) : prescriptions && prescriptions.length > 0 ? (
+              <>
+                {prescriptions.slice(0, 3).map((prescription) => (
+                  <div key={prescription.id} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="space-y-1">
+                      <p className="font-medium text-sm">{prescription.medication}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Dr. {prescription.doctorName}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Prescribed: {prescription.prescribedDate}
+                      </p>
                     </div>
-                    <div>
-                      <p className="font-medium">{medication.name}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {medication.dosage} • {medication.frequency}
-                      </p>
-                      <p className={`text-sm flex items-center text-muted-foreground`}>
-                        <Clock className="h-3 w-3 mr-1" />
-                        Next: {medication.nextDose}
-                      </p>
+                    <div className="flex flex-col items-end space-y-1">
+                      <Badge variant="outline" className={getStatusColor(prescription.status)}>
+                        {prescription.status}
+                      </Badge>
+                      <Button variant="ghost" size="sm">
+                        <Eye className="h-3 w-3" />
+                      </Button>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm">
-                    Take Now
-                  </Button>
-                </div>
-              ))
+                ))}
+                {prescriptions.length > 3 && (
+                  <p className="text-sm text-muted-foreground text-center pt-2">
+                    +{prescriptions.length - 3} more prescriptions
+                  </p>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No prescriptions found</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Recent Test Reports */}
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <div className="flex items-center space-x-2">
+              <Activity className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg">Recent Test Reports</CardTitle>
+            </div>
+            <Link href="/patient/testreports">
+              <Button variant="ghost" size="sm">
+                View All
+                <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {reportsLoading ? (
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+                <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4"></div>
+              </div>
+            ) : reports && reports.length > 0 ? (
+              <>
+                {reports.slice(0, 3).map((report) => (
+                  <div key={report.id} className="flex items-start justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="space-y-1">
+                      <p className="font-medium text-sm">{report.testName}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {report.laboratory}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Test Date: {report.testDate}
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-end space-y-1">
+                      <Badge variant="outline" className={getStatusColor(report.status)}>
+                        {report.status}
+                      </Badge>
+                      {report.status === "completed" && (
+                        <Button variant="ghost" size="sm">
+                          <Eye className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {reports.length > 3 && (
+                  <p className="text-sm text-muted-foreground text-center pt-2">
+                    +{reports.length - 3} more reports
+                  </p>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <Activity className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No test reports available</p>
+              </div>
             )}
           </CardContent>
         </Card>

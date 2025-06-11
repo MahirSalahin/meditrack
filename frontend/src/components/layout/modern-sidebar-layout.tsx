@@ -46,7 +46,7 @@ export function ModernSidebarLayout({ children, userType }: ModernSidebarLayoutP
         { icon: Pill, label: "Medications", href: "/patient/medications", active: false },
         { icon: Calendar, label: "Appointments", href: "/patient/appointments", active: false },
         { icon: FileText, label: "Prescriptions", href: "/patient/prescriptions", active: false },
-        { icon: FolderOpen, label: "Medical Records", href: "/patient/records", active: false },
+        { icon: Activity, label: "Test Reports", href: "/patient/testreports", active: false },
       ],
     },
     {
@@ -70,6 +70,7 @@ export function ModernSidebarLayout({ children, userType }: ModernSidebarLayoutP
       section: "PRACTICE",
       items: [
         { icon: Calendar, label: "Appointments", href: "/doctor/appointments", active: false },
+        { icon: FileText, label: "Prescriptions", href: "/doctor/prescriptions", active: false }, // Add this
       ],
     },
     {

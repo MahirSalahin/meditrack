@@ -38,31 +38,7 @@ const getTestReportsData = async (): Promise<TestReport[]> => {
             orderedBy: "Dr. Sarah Johnson",
             laboratory: "City Lab Center",
             status: "completed",
-            summary: "All parameters within normal range. No abnormalities detected.",
-            results: [
-                {
-                    parameter: "Hemoglobin",
-                    value: "14.2",
-                    unit: "g/dL",
-                    referenceRange: "12.0-15.0",
-                    status: "normal"
-                },
-                {
-                    parameter: "White Blood Cells",
-                    value: "7500",
-                    unit: "/μL",
-                    referenceRange: "4000-11000",
-                    status: "normal"
-                }
-            ],
-            attachments: [
-                {
-                    id: "ATT001",
-                    name: "CBC_Report.pdf",
-                    type: "application/pdf",
-                    url: "/reports/TR001_cbc.pdf"
-                }
-            ]
+            summary: "All parameters within normal range. No abnormalities detected."
         },
         {
             id: "TR002",
@@ -72,15 +48,17 @@ const getTestReportsData = async (): Promise<TestReport[]> => {
             orderedBy: "Dr. Michael Chen",
             laboratory: "Radiology Department",
             status: "completed",
-            summary: "No acute pulmonary abnormalities. Heart size normal.",
-            attachments: [
-                {
-                    id: "ATT002",
-                    name: "Chest_XRay.jpg",
-                    type: "image/jpeg",
-                    url: "/reports/TR002_xray.jpg"
-                }
-            ]
+            summary: "No acute pulmonary abnormalities. Heart size normal."
+        },
+        {
+            id: "TR003",
+            testName: "Lipid Panel",
+            testType: "blood",
+            testDate: "2024-01-25",
+            orderedBy: "Dr. Sarah Johnson",
+            laboratory: "City Lab Center",
+            status: "pending",
+            summary: "Results pending"
         }
     ]
 }
