@@ -1,20 +1,23 @@
 from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from datetime import datetime
 import uuid
-from .mixins import TimestampMixin
-from .enums import Gender, BloodGroup
+from app.models.mixins import TimestampMixin
+from app.models.enums import Gender, BloodGroup
+
+if TYPE_CHECKING:
+    from app.models.auth import User
 
 
 # Patient Profile Model
 class PatientProfile(TimestampMixin, table=True):
     __tablename__ = "patient_profiles"
-    
+
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    
+
     # Foreign Keys
     user_id: uuid.UUID = Field(foreign_key="users.id", unique=True)
-    
+
     # Patient Profile Fields
     date_of_birth: Optional[datetime] = Field(default=None)
     gender: Optional[Gender] = Field(default=None)
@@ -25,10 +28,10 @@ class PatientProfile(TimestampMixin, table=True):
     insurance_info: Optional[str] = Field(default=None)  # JSON string
     allergies: Optional[str] = Field(default=None)  # JSON string
     medical_history: Optional[str] = Field(default=None)  # JSON string
-    
+
     # Relationships (forward reference to avoid circular imports)
     user: "User" = Relationship(back_populates="patient_profile")
-    
+
     @property
     def age(self) -> Optional[int]:
         if self.date_of_birth:
@@ -40,15 +43,15 @@ class PatientProfile(TimestampMixin, table=True):
         return None
 
 
-# Doctor Profile Model  
+# Doctor Profile Model
 class DoctorProfile(TimestampMixin, table=True):
     __tablename__ = "doctor_profiles"
-    
+
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    
+
     # Foreign Keys
     user_id: uuid.UUID = Field(foreign_key="users.id", unique=True)
-    
+
     # Doctor Profile Fields
     medical_license_number: str = Field(max_length=50, unique=True, index=True)
     license_expiry_date: Optional[datetime] = Field(default=None)
@@ -61,12 +64,12 @@ class DoctorProfile(TimestampMixin, table=True):
         default=None)  # JSON string for days/times
     bio: Optional[str] = Field(default=None, max_length=1000)
     is_verified: bool = Field(default=False)  # Admin verification status
-    
+
     # Relationships (forward reference to avoid circular imports)
     user: "User" = Relationship(back_populates="doctor_profile")
-    
+
     @property
     def is_license_valid(self) -> bool:
         if self.license_expiry_date:
             return self.license_expiry_date > datetime.utcnow()
-        return True  # Assume valid if no expiry date set 
+        return True  # Assume valid if no expiry date set
