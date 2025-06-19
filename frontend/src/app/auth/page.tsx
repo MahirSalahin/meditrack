@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Activity, Calendar, FileText, Users, Stethoscope, Heart } from "lucide-react"
+import { Activity, Calendar, FileText, Users, Stethoscope, Heart, LogIn } from "lucide-react"
 
 export default function AuthPage() {
   return (
@@ -28,6 +28,32 @@ export default function AuthPage() {
             <CardDescription className="text-slate-500">Choose your account type to continue</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pb-8">
+            {/* Login Button */}
+            <Link href="/auth/login" className="block">
+              <Button
+                className="w-full h-16 bg-blue-500 hover:bg-blue-600 text-white font-medium transition-all duration-300 group"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-white/20 group-hover:bg-white/30 rounded-xl flex items-center justify-center transition-colors duration-300">
+                    <LogIn className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-lg font-semibold text-white">Sign In</div>
+                    <div className="text-sm text-blue-100">Access your existing account</div>
+                  </div>
+                </div>
+              </Button>
+            </Link>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-slate-200" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-slate-500">Or register as</span>
+              </div>
+            </div>
+
             <Link href="/auth/doctor" className="block">
               <Button
                 variant="outline"

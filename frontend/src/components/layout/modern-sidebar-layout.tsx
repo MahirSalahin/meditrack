@@ -19,10 +19,12 @@ import {
   Activity,
   Search,
   Bell,
+  LogOut,
 } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { logout } from "@/lib/api/auth.service"
 
 interface ModernSidebarLayoutProps {
   children: React.ReactNode
@@ -46,7 +48,7 @@ export function ModernSidebarLayout({ children, userType }: ModernSidebarLayoutP
         { icon: Pill, label: "Medications", href: "/patient/medications", active: false },
         { icon: Calendar, label: "Appointments", href: "/patient/appointments", active: false },
         { icon: FileText, label: "Prescriptions", href: "/patient/prescriptions", active: false },
-        { icon: Activity, label: "Test Reports", href: "/patient/testreports", active: false },
+        { icon: FolderOpen, label: "Medical Records", href: "/patient/records", active: false },
       ],
     },
     {
@@ -70,7 +72,6 @@ export function ModernSidebarLayout({ children, userType }: ModernSidebarLayoutP
       section: "PRACTICE",
       items: [
         { icon: Calendar, label: "Appointments", href: "/doctor/appointments", active: false },
-        { icon: FileText, label: "Prescriptions", href: "/doctor/prescriptions", active: false }, // Add this
       ],
     },
     {
@@ -125,6 +126,20 @@ export function ModernSidebarLayout({ children, userType }: ModernSidebarLayoutP
               </div>
             </div>
           ))}
+
+          {/* Logout Section */}
+          <div className="pt-2 border-t border-border">
+            <Button
+              variant="ghost"
+              className="w-full justify-start h-10 px-3 text-sm text-red-600 hover:text-red-700 hover:bg-red-50"
+              onClick={async () => {
+                await logout()
+              }}
+            >
+              <LogOut className="mr-3 h-4 w-4" />
+              Sign Out
+            </Button>
+          </div>
         </nav>
       </div>
     )
@@ -170,9 +185,6 @@ export function ModernSidebarLayout({ children, userType }: ModernSidebarLayoutP
             >
               <Settings className="h-5 w-5" />
             </Button>
-            <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center border border-primary/20">
-              <User className="h-4 w-4 text-primary" />
-            </div>
           </div>
         </header>
         <main className="p-6 bg-background">{children}</main>

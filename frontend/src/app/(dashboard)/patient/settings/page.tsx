@@ -6,89 +6,70 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import TitleHeader from '@/components/title-header'
-import { User } from "lucide-react"
-import { Bell } from "lucide-react"
-import { Shield } from "lucide-react"
-import { Lock } from "lucide-react"
-
 
 export default function SettingsPage() {
     return (
         <div className="container mx-auto px-4 space-y-6">
             <TitleHeader
                 title="Settings"
-                description="Manage your account settings and preferences"
             />
 
-            <div className="grid gap-6">
             {/* Profile Settings */}
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                        <User className="h-5 w-5" />
-                        <span>Profile Settings</span>
-                    </CardTitle>
+                    <CardTitle>Profile Settings</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="grid gap-4 md:grid-cols-2">
+                    <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="firstName">First Name</Label>
-                            <Input id="firstName" defaultValue="John" />
+                            <Input id="firstName" placeholder="Enter your first name" />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="lastName">Last Name</Label>
-                            <Input id="lastName" defaultValue="Doe" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" defaultValue="john.doe@email.com" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="phone">Phone</Label>
-                            <Input id="phone" defaultValue="+1 (555) 123-4567" />
+                            <Input id="lastName" placeholder="Enter your last name" />
                         </div>
                     </div>
-                    <Button>Save Changes</Button>
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input id="email" type="email" placeholder="Enter your email" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input id="phone" type="tel" placeholder="Enter your phone number" />
+                    </div>
+                    <Button className="mt-4">Save Changes</Button>
                 </CardContent>
             </Card>
 
-            {/* Notification Settings */}
+            {/* Notification Preferences */}
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                        <Bell className="h-5 w-5" />
-                        <span>Notifications</span>
-                    </CardTitle>
+                    <CardTitle>Notification Preferences</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
                             <Label>Appointment Reminders</Label>
-                            <p className="text-sm text-muted-foreground">
-                                Get reminded about upcoming appointments
-                            </p>
+                            <p className="text-sm text-muted-foreground">Receive notifications for upcoming appointments</p>
                         </div>
-                        <Switch defaultChecked />
+                        <Switch />
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                            <Label>Medication Reminders</Label>
-                            <p className="text-sm text-muted-foreground">
-                                Receive notifications for medication times
-                            </p>
+                            <Label>Medication Alerts</Label>
+                            <p className="text-sm text-muted-foreground">Get reminders for medication schedules</p>
                         </div>
-                        <Switch defaultChecked />
+                        <Switch />
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
                             <Label>Test Results</Label>
-                            <p className="text-sm text-muted-foreground">
-                                Get notified when test results are available
-                            </p>
+                            <p className="text-sm text-muted-foreground">Notifications when new test results are available</p>
                         </div>
-                        <Switch defaultChecked />
+                        <Switch />
                     </div>
                 </CardContent>
             </Card>
@@ -96,10 +77,7 @@ export default function SettingsPage() {
             {/* Privacy Settings */}
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                        <Shield className="h-5 w-5" />
-                        <span>Privacy Settings</span>
-                    </CardTitle>
+                    <CardTitle>Privacy Settings</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -123,10 +101,7 @@ export default function SettingsPage() {
             {/* Account Security */}
             <Card>
                 <CardHeader>
-                    <CardTitle className="flex items-center space-x-2">
-                        <Lock className="h-5 w-5" />
-                        <span>Account Security</span>
-                    </CardTitle>
+                    <CardTitle>Account Security</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -168,7 +143,6 @@ export default function SettingsPage() {
                     </div>
                 </CardContent>
             </Card>
-            </div>
         </div>
     )
 }
