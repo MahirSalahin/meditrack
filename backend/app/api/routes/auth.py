@@ -26,7 +26,6 @@ router = APIRouter()
 @router.post("/login", response_model=Token)
 async def login(
     login_data: LoginRequest,
-    session: SessionDep
 ):
     """Authenticate user and return JWT token."""
     # Get user by email

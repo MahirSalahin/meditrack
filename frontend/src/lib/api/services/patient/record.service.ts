@@ -1,93 +1,126 @@
 import { wait } from "@/lib/wait"
+import { MedicalRecord, RecordStats } from "./types"
 import { useQuery } from "@tanstack/react-query"
 
-export interface TestReport {
-    id: string
-    testName: string
-    testType: "blood" | "urine" | "imaging" | "cardiac" | "other"
-    testDate: string
-    orderedBy: string
-    laboratory: string
-    status: "scheduled" | "pending" | "completed" | "cancelled"
-    results?: TestResult[]
-    summary?: string
-    attachments?: {
-        id: string
-        name: string
-        type: string
-        url: string
-    }[]
+const getRecordStatsData = async (): Promise<RecordStats> => {
+    await wait(500)
+    return {
+        total: 6,
+        checkup: 1,
+        lab: 1,
+        imaging: 1,
+        specialist: 1,
+        vaccination: 1,
+        prescription: 1
+    }
 }
 
-export interface TestResult {
-    parameter: string
-    value: string
-    unit: string
-    referenceRange: string
-    status: "normal" | "high" | "low" | "critical"
-}
-
-const getTestReportsData = async (): Promise<TestReport[]> => {
-    await wait(800)
+const getRecordsListData = async (): Promise<MedicalRecord[]> => {
+    await wait(700)
     return [
         {
-            id: "TR001",
-            testName: "Complete Blood Count (CBC)",
-            testType: "blood",
-            testDate: "2024-01-20",
-            orderedBy: "Dr. Sarah Johnson",
-            laboratory: "City Lab Center",
-            status: "completed",
-            summary: "All parameters within normal range. No abnormalities detected.",
-            results: [
-                {
-                    parameter: "Hemoglobin",
-                    value: "14.2",
-                    unit: "g/dL",
-                    referenceRange: "12.0-15.0",
-                    status: "normal"
-                },
-                {
-                    parameter: "White Blood Cells",
-                    value: "7500",
-                    unit: "/μL",
-                    referenceRange: "4000-11000",
-                    status: "normal"
-                }
-            ],
-            attachments: [
-                {
-                    id: "ATT001",
-                    name: "CBC_Report.pdf",
-                    type: "application/pdf",
-                    url: "/reports/TR001_cbc.pdf"
-                }
-            ]
+            id: "MR001",
+            title: "Annual Physical Examination",
+            category: "checkup",
+            date: "2024-01-15",
+            doctor: "Dr. Sarah Johnson",
+            facility: "City Medical Center",
+            type: "Report",
+            fileType: "PDF",
+            size: "2.4 MB",
+            summary: "Comprehensive annual physical examination with normal findings. Blood pressure, heart rate, and basic metabolic panel all within normal limits.",
+            tags: ["Physical", "Annual", "Normal"],
+            priority: "normal",
+            attachments: 3,
         },
         {
-            id: "TR002",
-            testName: "Chest X-Ray",
-            testType: "imaging",
-            testDate: "2024-01-18",
-            orderedBy: "Dr. Michael Chen",
-            laboratory: "Radiology Department",
-            status: "completed",
-            summary: "No acute pulmonary abnormalities. Heart size normal.",
-            attachments: [
-                {
-                    id: "ATT002",
-                    name: "Chest_XRay.jpg",
-                    type: "image/jpeg",
-                    url: "/reports/TR002_xray.jpg"
-                }
-            ]
-        }
+            id: "MR002",
+            title: "Blood Test Results - Lipid Panel",
+            category: "lab",
+            date: "2024-01-10",
+            doctor: "Dr. Sarah Johnson",
+            facility: "LabCorp",
+            type: "Lab Result",
+            fileType: "PDF",
+            size: "1.2 MB",
+            summary: "Lipid panel showing slightly elevated cholesterol levels. Total cholesterol: 220 mg/dL. Recommend dietary modifications.",
+            tags: ["Blood Test", "Cholesterol", "Elevated"],
+            priority: "medium",
+            attachments: 1,
+        },
+        {
+            id: "MR003",
+            title: "Chest X-Ray",
+            category: "imaging",
+            date: "2024-01-08",
+            doctor: "Dr. Michael Chen",
+            facility: "Radiology Associates",
+            type: "Imaging",
+            fileType: "DICOM",
+            size: "15.6 MB",
+            summary: "Chest X-ray performed for routine screening. No acute cardiopulmonary abnormalities detected. Heart size normal.",
+            tags: ["X-Ray", "Chest", "Normal"],
+            priority: "normal",
+            attachments: 2,
+        },
+        {
+            id: "MR004",
+            title: "Cardiology Consultation",
+            category: "specialist",
+            date: "2023-12-20",
+            doctor: "Dr. Robert Wilson",
+            facility: "Heart Institute",
+            type: "Consultation",
+            fileType: "PDF",
+            size: "3.1 MB",
+            summary: "Cardiology consultation for chest pain evaluation. EKG normal. Stress test recommended for further evaluation.",
+            tags: ["Cardiology", "Chest Pain", "EKG"],
+            priority: "high",
+            attachments: 4,
+        },
+        {
+            id: "MR005",
+            title: "Vaccination Record - COVID-19 Booster",
+            category: "vaccination",
+            date: "2023-11-15",
+            doctor: "Dr. Sarah Johnson",
+            facility: "City Medical Center",
+            type: "Vaccination",
+            fileType: "PDF",
+            size: "0.8 MB",
+            summary: "COVID-19 booster vaccination administered. No adverse reactions reported. Next booster due in 6 months.",
+            tags: ["Vaccination", "COVID-19", "Booster"],
+            priority: "normal",
+            attachments: 1,
+        },
+        {
+            id: "MR006",
+            title: "Prescription History - Diabetes Management",
+            category: "prescription",
+            date: "2023-10-30",
+            doctor: "Dr. Michael Chen",
+            facility: "Endocrine Clinic",
+            type: "Prescription",
+            fileType: "PDF",
+            size: "1.5 MB",
+            summary: "Updated diabetes management plan with Metformin dosage adjustment. HbA1c improved to 6.8%. Continue current regimen.",
+            tags: ["Diabetes", "Metformin", "HbA1c"],
+            priority: "medium",
+            attachments: 2,
+        },
     ]
 }
 
-export const useTestReports = () => {
+export const useRecordStats = () => {
     return useQuery({
-        queryKey: ["test-reports"],
-        queryFn: getTestReportsData
+        queryKey: ["record-stats"],
+        queryFn: getRecordStatsData,
+    })
+}
+
+export const useRecordsList = () => {
+    return useQuery({
+        queryKey: ["records-list"],
+        queryFn: getRecordsListData,
     })
 }
