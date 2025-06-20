@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 import uuid
 from app.models.mixins import TimestampMixin
@@ -7,6 +7,11 @@ from app.models.enums import Gender, BloodGroup
 
 if TYPE_CHECKING:
     from app.models.auth import User
+    from app.models.medical_records import MedicalRecord
+    from app.models.appointments import Appointment
+    from app.models.medications import Prescription
+    from app.models.health_metrics import HealthMetric
+    from app.models.medical_conditions import MedicalCondition
 
 
 # Patient Profile Model
@@ -31,6 +36,13 @@ class PatientProfile(TimestampMixin, table=True):
 
     # Relationships (forward reference to avoid circular imports)
     user: "User" = Relationship(back_populates="patient_profile")
+    
+    # New relationships
+    medical_records: List["MedicalRecord"] = Relationship(back_populates="patient")
+    appointments: List["Appointment"] = Relationship(back_populates="patient") 
+    prescriptions: List["Prescription"] = Relationship(back_populates="patient")
+    health_metrics: List["HealthMetric"] = Relationship(back_populates="patient")
+    medical_conditions: List["MedicalCondition"] = Relationship(back_populates="patient")
 
     @property
     def age(self) -> Optional[int]:
@@ -67,6 +79,11 @@ class DoctorProfile(TimestampMixin, table=True):
 
     # Relationships (forward reference to avoid circular imports)
     user: "User" = Relationship(back_populates="doctor_profile")
+    
+    # New relationships
+    medical_records: List["MedicalRecord"] = Relationship(back_populates="doctor")
+    appointments: List["Appointment"] = Relationship(back_populates="doctor")
+    prescriptions: List["Prescription"] = Relationship(back_populates="doctor")
 
     @property
     def is_license_valid(self) -> bool:
