@@ -3,6 +3,7 @@
 import { Loader2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import NextTopLoader from 'nextjs-toploader';
+import { SessionProvider } from 'next-auth/react';
 
 export default function MyLayout({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState(false)
@@ -21,12 +22,14 @@ export default function MyLayout({ children }: { children: React.ReactNode }) {
 
     return (
         <>
-            <NextTopLoader
-                color="var(--primary)" 
-                height={3}
-                showSpinner={false}
-            />
-            {children}
+            <SessionProvider>
+                <NextTopLoader
+                    height={4}
+                    showSpinner={true}
+                    color='#5a3bf6'
+                />
+                {children}
+            </SessionProvider>
         </>
     )
 }
