@@ -11,8 +11,6 @@ import {
     PatientsListSkeleton
 } from "@/components/skeletons/doctor/patients.skeleton"
 import TitleHeader from "@/components/title-header"
-import Link from "next/link"
-import { Eye } from "lucide-react"
 
 export default function PatientsPage() {
     const { data: patients, isLoading: patientsLoading } = usePatients()
@@ -161,12 +159,10 @@ export default function PatientsPage() {
                                             <Calendar className="h-4 w-4 mr-2" />
                                             Schedule
                                         </Button>
-                                        <Link href={`/doctor/patients/${patient.id}`}>
-                                            <Button size="sm">
-                                                <Eye className="h-4 w-4 mr-2" />
-                                                View History
-                                            </Button>
-                                        </Link>
+                                        <Button size="sm">
+                                            <Clock className="h-4 w-4 mr-2" />
+                                            View History
+                                        </Button>
                                     </div>
                                 </div>
                             </CardContent>
