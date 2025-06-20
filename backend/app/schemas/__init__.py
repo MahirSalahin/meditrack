@@ -26,8 +26,21 @@ from .profiles import (
     DoctorProfileUpdate
 )
 
+from .appointments import (
+    # Appointment schemas
+    AppointmentCreate,
+    AppointmentUpdate,
+    AppointmentRead,
+    AppointmentWithDetails,
+    AppointmentSearchFilters,
+    AppointmentStats,
+    AppointmentReminderCreate,
+    AppointmentReminderRead,
+    AppointmentBatchUpdate
+)
+
 # Import enums from models
-from app.models.enums import UserType, BloodGroup, Gender
+from app.models.enums import UserType, BloodGroup, Gender, AppointmentStatus, AppointmentType
 
 __all__ = [
     # Base schemas
@@ -47,6 +60,17 @@ __all__ = [
     "DoctorProfileCreate", 
     "DoctorProfileUpdate",
     
+    # Appointment schemas
+    "AppointmentCreate",
+    "AppointmentUpdate",
+    "AppointmentRead",
+    "AppointmentWithDetails",
+    "AppointmentSearchFilters",
+    "AppointmentStats",
+    "AppointmentReminderCreate",
+    "AppointmentReminderRead",
+    "AppointmentBatchUpdate",
+    
     # Auth schemas
     "Token",
     "TokenData",
@@ -59,5 +83,7 @@ __all__ = [
     # Enums
     "UserType",
     "BloodGroup",
-    "Gender"
+    "Gender",
+    "AppointmentStatus",
+    "AppointmentType"
 ]
