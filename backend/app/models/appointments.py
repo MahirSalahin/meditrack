@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import Field, Relationship
 from typing import Optional, List, TYPE_CHECKING
 from datetime import datetime
 import uuid
