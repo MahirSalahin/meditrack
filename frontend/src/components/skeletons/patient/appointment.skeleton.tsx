@@ -66,10 +66,14 @@ export function AppointmentCardSkeleton() {
 export function AppointmentStatusCardSkeleton() {
     return (
         <Card className="shadow-sm">
-            <CardContent className="p-4">
-                <div className="space-y-2">
-                    <Skeleton className="h-4 max-w-20 w-full" />
-                    <Skeleton className="h-8 max-w-24 w-full" />
+            <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <Skeleton className="h-4 w-20 mb-2" />
+                        <Skeleton className="h-8 w-16 mb-1" />
+                        <Skeleton className="h-3 w-24" />
+                    </div>
+                    <Skeleton className="h-12 w-12 rounded-full" />
                 </div>
             </CardContent>
         </Card>

@@ -31,6 +31,7 @@ class AppointmentBase(BaseModel):
 
 
 class AppointmentCreate(AppointmentBase):
+    status: AppointmentStatus = AppointmentStatus.SCHEDULED
     doctor_id: uuid.UUID
     patient_id: Optional[uuid.UUID] = None  # Set by middleware for patients
 
