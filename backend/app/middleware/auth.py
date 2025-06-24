@@ -6,7 +6,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from app.utils.auth import verify_token
 from app.crud.auth import get_user_by_id
 from app.models.auth import User
-from app.models.enums import UserType
 from typing import Optional
 import logging
 

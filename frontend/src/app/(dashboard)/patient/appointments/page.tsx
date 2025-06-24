@@ -95,31 +95,29 @@ export default function AppointmentsPage() {
             <AppointmentCardSkeleton />
             <AppointmentCardSkeleton />
           </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredAppointments.map((appointment) => (
-              <AppointmentCard key={appointment.id} appointment={appointment} />
-            ))}
-          </div>
-        )
+        ) :
+          filteredAppointments?.length > 0 ? (
+            <div className="space-y-4">
+              {filteredAppointments.map((appointment) => (
+                <AppointmentCard key={appointment.id} appointment={appointment} />
+              ))}
+            </div>
+          ) : (
+            <Card className="shadow-sm">
+              <CardContent className="p-12 text-center">
+                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">No appointments found</h3>
+                <p className="text-muted-foreground mb-4">
+                  {searchTerm ? "Try adjusting your search terms" : "Schedule your first appointment to get started"}
+                </p>
+                <Button onClick={() => setIsAppointmentDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Book Appointment
+                </Button>
+              </CardContent>
+            </Card>
+          )
       }
-
-      {/* No appointments found */}
-      {filteredAppointments.length === 0 && (
-        <Card className="shadow-sm">
-          <CardContent className="p-12 text-center">
-            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium mb-2">No appointments found</h3>
-            <p className="text-muted-foreground mb-4">
-              {searchTerm ? "Try adjusting your search terms" : "Schedule your first appointment to get started"}
-            </p>
-            <Button onClick={() => setIsAppointmentDialogOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Book Appointment
-            </Button>
-          </CardContent>
-        </Card>
-      )}
 
       <AppointmentDialog
         isOpen={isAppointmentDialogOpen}
