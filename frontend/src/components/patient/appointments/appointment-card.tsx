@@ -90,7 +90,7 @@ export default function AppointmentCard({ appointment }: { appointment: Appointm
                         </div>
                         <div>
                             <div className="flex items-center space-x-3 mb-2">
-                                <h3 className="text-lg font-semibold">Dr. {appointment.doctor_name || 'Unknown'}</h3>
+                                <h3 className="text-lg font-semibold">{appointment.doctor_name || 'Unknown'}</h3>
                                 <Badge variant={getStatusVariant(appointment.status)}>
                                     {getStatusIcon(appointment.status)}
                                     <span className="ml-1">{getStatusLabel(appointment.status)}</span>

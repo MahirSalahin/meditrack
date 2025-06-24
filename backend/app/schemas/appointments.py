@@ -73,6 +73,8 @@ class AppointmentRead(AppointmentBase, TimestampSchema):
     follow_up_required: bool
     follow_up_date: Optional[datetime]
     payment_status: Optional[str]
+    patient_name: Optional[str] = None
+    doctor_name: Optional[str] = None
 
     class Config:
         from_attributes = True
