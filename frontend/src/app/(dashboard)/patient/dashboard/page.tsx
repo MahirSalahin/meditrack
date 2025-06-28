@@ -55,66 +55,6 @@ export default function PatientDashboard() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {statsLoading ? (
-          <>
-            <StatsCardSkeleton />
-            <StatsCardSkeleton />
-            <StatsCardSkeleton />
-          </>
-        ) : (
-          <>
-            <Card className="shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-muted-foreground">Total active users</h3>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-3xl font-bold">{stats?.totalActiveUsers.toLocaleString()}</div>
-                  <div className="flex items-center text-sm">
-                    <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                    <span className="text-green-500">{stats?.activeUsersChange}</span>
-                    <span className="text-gray-500 ml-1">last 7 days</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-muted-foreground">Total installed</h3>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-3xl font-bold">{stats?.totalInstalled.toLocaleString()}</div>
-                  <div className="flex items-center text-sm">
-                    <TrendingUp className="h-3 w-3 text-blue-500 mr-1" />
-                    <span className="text-blue-500">{stats?.installedChange}</span>
-                    <span className="text-gray-500 ml-1">last 7 days</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="shadow-sm">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-muted-foreground">Total downloads</h3>
-                </div>
-                <div className="space-y-2">
-                  <div className="text-3xl font-bold">{stats?.totalDownloads}</div>
-                  <div className="flex items-center text-sm">
-                    <span className="text-red-500">{stats?.downloadsChange}</span>
-                    <span className="text-gray-500 ml-1">last 7 days</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </>
-        )}
-      </div>
-
       {/* Health Metrics */}
       <Card className="shadow-sm">
         <CardHeader>

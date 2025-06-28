@@ -80,7 +80,8 @@ export interface DoctorProfile {
   updated_at: string;
 }
 
-export interface UserWithProfile extends User {
+export interface UserWithProfile {
+  user: User;
   patient_profile?: PatientProfile;
   doctor_profile?: DoctorProfile;
 }
