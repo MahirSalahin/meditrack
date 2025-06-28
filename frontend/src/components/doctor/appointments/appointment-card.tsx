@@ -138,14 +138,57 @@ export default function DoctorAppointmentCard({ appointment }: DoctorAppointment
                             </div>
                         </div>
                         <div className="flex space-x-2">
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setShowCancelDialog(true)}
-                            >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Cancel
-                            </Button>
+                            {/* Reminders Component */}
+                            <AppointmentReminders
+                                appointmentId={appointment.id}
+                                appointmentDate={appointment.appointment_date}
+                                variant="badge"
+                            />
+
+                            {/* Status Update Buttons */}
+                            {appointment.status === AppointmentStatus.SCHEDULED && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleStatusUpdate(AppointmentStatus.CONFIRMED)}
+                                    disabled={updateAppointment.isPending}
+                                >
+                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    Confirm
+                                </Button>
+                            )}
+                            {appointment.status === AppointmentStatus.CONFIRMED && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleStatusUpdate(AppointmentStatus.IN_PROGRESS)}
+                                    disabled={updateAppointment.isPending}
+                                >
+                                    <Clock className="h-4 w-4 mr-2" />
+                                    Start
+                                </Button>
+                            )}
+                            {appointment.status === AppointmentStatus.IN_PROGRESS && (
+                                <Button
+                                    size="sm"
+                                    onClick={() => handleStatusUpdate(AppointmentStatus.COMPLETED)}
+                                    disabled={updateAppointment.isPending}
+                                >
+                                    <CheckCircle className="h-4 w-4 mr-2" />
+                                    Complete
+                                </Button>
+                            )}
+                            {/* Show Cancel button only if not cancelled */}
+                            {appointment.status !== AppointmentStatus.CANCELLED && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setShowCancelDialog(true)}
+                                >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Cancel
+                                </Button>
+                            )}
                         </div>
                     </div>
 
@@ -268,6 +311,17 @@ export default function DoctorAppointmentCard({ appointment }: DoctorAppointment
                                 >
                                     <CheckCircle className="h-4 w-4 mr-2" />
                                     Complete
+                                </Button>
+                            )}
+                            {/* Show Cancel button only if not cancelled */}
+                            {appointment.status !== AppointmentStatus.CANCELLED && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setShowCancelDialog(true)}
+                                >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Cancel
                                 </Button>
                             )}
                         </div>

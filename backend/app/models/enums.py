@@ -73,6 +73,7 @@ class MedicationStatus(str, Enum):
 
 
 class PrescriptionStatus(str, Enum):
+    DRAFT = "draft"
     ACTIVE = "active"
     COMPLETED = "completed"
     DISCONTINUED = "discontinued"

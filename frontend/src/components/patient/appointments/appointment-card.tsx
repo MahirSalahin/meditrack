@@ -115,14 +115,17 @@ export default function AppointmentCard({ appointment }: { appointment: Appointm
                             </div>
                         </div>
                         <div className="flex space-x-2">
-                            <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => setShowCancelDialog(true)}
-                            >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                Cancel
-                            </Button>
+                            {/* Show Cancel button only if not cancelled */}
+                            {appointment.status !== AppointmentStatus.CANCELLED && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => setShowCancelDialog(true)}
+                                >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Cancel
+                                </Button>
+                            )}
                         </div>
                     </div>
 
@@ -189,13 +192,15 @@ export default function AppointmentCard({ appointment }: { appointment: Appointm
                                 <span>Dr. {appointment.doctor_name || 'Unknown'}</span>
                             </div>
                         </div>
-                        <div className="flex space-x-2">
-                            <AppointmentReminders
-                                appointmentId={appointment.id}
-                                appointmentDate={appointment.appointment_date}
-                                variant="badge"
-                            />
-                        </div>
+                        {appointment.status !== AppointmentStatus.CANCELLED && (
+                            <div className="flex space-x-2">
+                                <AppointmentReminders
+                                    appointmentId={appointment.id}
+                                    appointmentDate={appointment.appointment_date}
+                                    variant="badge"
+                                />
+                            </div>
+                        )}
                     </div>
                 </CardContent>
             </Card>

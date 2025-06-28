@@ -139,6 +139,39 @@ class UserProfileUpdate(BaseModel):
 from .auth import UserRead
 
 
+# Patient Details for Doctor Portal
+class PatientDetailsForDoctor(BaseModel):
+    """Patient details schema for doctor portal access"""
+
+    id: str
+    name: str
+    email: str
+    phone: Optional[str] = None
+    age: Optional[int] = None
+    gender: Optional[Gender] = None
+    blood_group: Optional[BloodGroup] = None
+    allergies: Optional[list] = None
+    medical_history: Optional[str] = None
+    emergency_contact_name: Optional[str] = None
+    emergency_contact_phone: Optional[str] = None
+    address: Optional[str] = None
+    insurance_info: Optional[str] = None
+    date_of_birth: Optional[str] = None
+    is_bookmarked: bool = False
+
+    class Config:
+        from_attributes = True
+
+class PatientListResponse(BaseModel):
+    """Response schema for patient list with pagination"""
+
+    patients: list[PatientDetailsForDoctor]
+    total_count: int
+    page: int
+    page_size: int
+    total_pages: int
+
+
 # User profile schemas with profile data
 class UserProfileRead(BaseModel):
     """Combined user and profile data"""

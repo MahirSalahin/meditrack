@@ -33,7 +33,7 @@ export default function ProfilePage() {
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isDirty },
+    formState: { errors },
     reset
   } = useForm<UserProfileUpdate>()
 
@@ -62,12 +62,8 @@ export default function ProfilePage() {
   }, [user, patientProfile, reset])
 
   const onSubmit = async (data: UserProfileUpdate) => {
-    try {
-      await updateProfile.mutateAsync(data)
-      setIsEditing(false)
-    } catch (error) {
-      // Error handling is done in the mutation
-    }
+    await updateProfile.mutateAsync(data)
+    setIsEditing(false)
   }
 
   const handleCancel = () => {
@@ -175,7 +171,7 @@ export default function ProfilePage() {
                     <User className="w-12 h-12 text-muted-foreground" />
                   </div>
                   {isEditing && (
-                    <button 
+                    <button
                       type="button"
                       className="absolute -bottom-2 -right-2 p-2 bg-primary rounded-full text-primary-foreground hover:bg-primary/90"
                     >
@@ -187,16 +183,15 @@ export default function ProfilePage() {
                   <h3 className="text-lg font-semibold text-foreground">
                     {user.full_name}
                   </h3>
-                  <p className="text-muted-foreground">Patient ID: {user.id}</p>
+                  <p className="text-muted-foreground">Patient ID: {patientProfile?.id}</p>
                   <p className="text-sm text-muted-foreground">
                     Member since {formatDate(user.created_at, "MMMM yyyy") || "Unknown"}
                   </p>
                   <div className="flex items-center gap-2 mt-1">
-                    <div className={`px-2 py-1 text-xs rounded-full ${
-                      user.is_verified 
-                        ? "bg-green-100 text-green-800" 
+                    <div className={`px-2 py-1 text-xs rounded-full ${user.is_verified
+                        ? "bg-green-100 text-green-800"
                         : "bg-yellow-100 text-yellow-800"
-                    }`}>
+                      }`}>
                       {user.is_verified ? "Verified" : "Pending Verification"}
                     </div>
                   </div>
@@ -217,7 +212,7 @@ export default function ProfilePage() {
                     <p className="text-sm text-destructive">{errors.first_name.message}</p>
                   )}
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="last_name" className="text-foreground">Last Name</Label>
                   <Input
@@ -230,7 +225,7 @@ export default function ProfilePage() {
                     <p className="text-sm text-destructive">{errors.last_name.message}</p>
                   )}
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="email" className="text-foreground">Email</Label>
                   <Input
@@ -242,7 +237,7 @@ export default function ProfilePage() {
                   />
                   <p className="text-xs text-muted-foreground">Email cannot be changed</p>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-foreground">Phone Number</Label>
                   <Input
@@ -253,7 +248,7 @@ export default function ProfilePage() {
                     placeholder="+1 (555) 123-4567"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="date_of_birth" className="text-foreground">Date of Birth</Label>
                   <Input
@@ -264,7 +259,7 @@ export default function ProfilePage() {
                     className={!isEditing ? "bg-muted" : ""}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="gender" className="text-foreground">Gender</Label>
                   <Select
@@ -329,7 +324,7 @@ export default function ProfilePage() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label className="text-foreground">Age</Label>
                   <Input
@@ -351,7 +346,7 @@ export default function ProfilePage() {
                   placeholder="List any known allergies..."
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="medical_history" className="text-foreground">Medical History</Label>
                 <Textarea
@@ -391,7 +386,7 @@ export default function ProfilePage() {
                   placeholder="Emergency contact name"
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="emergency_contact_phone" className="text-foreground">Contact Phone</Label>
                 <Input
@@ -440,26 +435,24 @@ export default function ProfilePage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Account Status</span>
-                  <div className={`px-2 py-1 text-xs rounded-full ${
-                    user.is_active 
-                      ? "bg-green-100 text-green-800" 
+                  <div className={`px-2 py-1 text-xs rounded-full ${user.is_active
+                      ? "bg-green-100 text-green-800"
                       : "bg-red-100 text-red-800"
-                  }`}>
+                    }`}>
                     {user.is_active ? "Active" : "Inactive"}
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Email Verified</span>
-                  <div className={`px-2 py-1 text-xs rounded-full ${
-                    user.is_verified 
-                      ? "bg-green-100 text-green-800" 
+                  <div className={`px-2 py-1 text-xs rounded-full ${user.is_verified
+                      ? "bg-green-100 text-green-800"
                       : "bg-yellow-100 text-yellow-800"
-                  }`}>
+                    }`}>
                     {user.is_verified ? "Verified" : "Pending"}
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">User Type</span>
                   <span className="text-sm font-medium text-foreground capitalize">

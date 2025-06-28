@@ -9,7 +9,6 @@ import {
     DoctorSearchParams,
     DoctorSearchResponse,
     DoctorProfile,
-    DoctorSearchResult
 } from "@/types/profile"
 import { queryClient } from "../query-client"
 

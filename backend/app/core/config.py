@@ -25,6 +25,13 @@ class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: Annotated[list[AnyUrl] | str, BeforeValidator(parse_cors)] = [
         "http://localhost:3000",
     ]
+    BACKEND_URL: str = "http://localhost:8000"
+
+    # GCP Configuration
+    GCP_PROJECT_ID: str = "attensys-dev"
+    GCP_BUCKET_NAME: str = "test_recorded_video"
+    GCP_SERVICE_ACCOUNT_KEY_PATH: str = "attensys-dev.json"
+    GCP_SIGNED_URL_EXPIRATION: int = 3600  # 1 hour in seconds
 
     @property
     def POSTGRES_DATABASE_URL(self) -> PostgresDsn:

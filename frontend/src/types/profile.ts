@@ -138,5 +138,31 @@ export interface UserWithProfile {
     doctor_profile?: DoctorProfile;
 }
 
+export interface PatientProfileForDoctor {
+    id: string
+    name: string
+    email: string
+    phone?:string
+    age?: number
+    gender?: Gender
+    blood_group?: BloodGroup;
+    allergies?: string[];
+    medical_history?: string;
+    emergency_contact_name?: string;
+    emergency_contact_phone?: string;
+    address?: string;
+    insurance_info?: string;
+    date_of_birth?: string;
+    is_bookmarked?: boolean;
+}
+
+export interface BookmarkPatient{
+    patients: PatientProfileForDoctor[]
+    total_count: number;
+    page: number;
+    page_size: number;
+    total_pages: number;
+}
+
 // Import User type to avoid circular dependency
 import { User } from './user' 

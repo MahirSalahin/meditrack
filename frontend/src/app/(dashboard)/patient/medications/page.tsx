@@ -1,9 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Plus, Search, Filter } from "lucide-react"
+import { Search } from "lucide-react"
 import { QuickActions } from "@/components/patient/medications/quick-actions"
 import { MedicationsList } from "@/components/patient/medications/medications-list"
 import { MedicationSidebar } from "@/components/patient/medications/medication-sidebar"
@@ -20,10 +19,6 @@ export default function MedicationsPage() {
           title="My Medications"
           description="Manage your prescriptions and medication schedule"
         />
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Medication
-        </Button>
       </div>
 
       {/* Quick Actions */}
@@ -40,10 +35,6 @@ export default function MedicationsPage() {
             className="pl-10"
           />
         </div>
-        <Button variant="outline">
-          <Filter className="h-4 w-4 mr-2" />
-          Filter
-        </Button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">

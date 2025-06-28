@@ -105,7 +105,7 @@ export function ModernSidebarLayout({ children, userType }: ModernSidebarLayoutP
               <h3 className="px-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">{section.section}</h3>
               <div className="space-y-1">
                 {section.items.map((item) => {
-                  const isActive = pathname === item.href
+                  const isActive = pathname.includes(item.href)
                   return (
                     <Link
                       key={item.href}

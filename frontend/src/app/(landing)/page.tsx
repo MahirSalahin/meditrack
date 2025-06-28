@@ -121,7 +121,8 @@ export default function LandingPage() {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              ) : (
+              ) : 
+              (
                 // Not authenticated
                 <div className="flex items-center space-x-3">
                   <Link href="/auth/login">
@@ -129,7 +130,7 @@ export default function LandingPage() {
                       Sign In
                     </Button>
                   </Link>
-                  <Link href="/auth/doctor">
+                  <Link href="/auth">
                     <Button className="bg-blue-600 text-white hover:bg-blue-700">
                       Get Started
                     </Button>
@@ -170,7 +171,8 @@ export default function LandingPage() {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                 </Link>
-              ) : (
+              ) : 
+              status == 'unauthenticated' ? (
                 // User is not logged in - show registration options
                 <>
                   <Link href="/auth/patient">
@@ -191,7 +193,7 @@ export default function LandingPage() {
                     </Button>
                   </Link>
                 </>
-              )}
+              ) : null}
             </div>
 
             {/* Stats */}

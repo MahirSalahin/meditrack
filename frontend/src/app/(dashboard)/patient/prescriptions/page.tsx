@@ -3,21 +3,24 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Download, Search } from "lucide-react"
+import { Plus, Search } from "lucide-react"
 import { PrescriptionStats } from "@/components/patient/prescriptions/prescription-stats"
 import { PrescriptionList } from "@/components/patient/prescriptions/prescription-list"
 import TitleHeader from "@/components/title-header"
+import { UploadPrescriptionDialog } from "@/components/patient/prescriptions/upload-prescription-dialog"
+import type { PrescriptionStatus } from "@/types/prescription"
 
 export default function PrescriptionsPage() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState<string>()
-
+  const [selectedCategory, setSelectedCategory] = useState<PrescriptionStatus | undefined>(undefined)
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
+  
   const categories = [
     { label: "All", value: undefined },
-    { label: "Active", value: "active" },
-    { label: "Pending", value: "pending" },
-    { label: "Completed", value: "completed" },
-    { label: "Expired", value: "expired" },
+    { label: "Active", value: "active" as PrescriptionStatus },
+    { label: "Draft", value: "draft" as PrescriptionStatus },
+    { label: "Completed", value: "completed" as PrescriptionStatus },
+    { label: "Expired", value: "expired" as PrescriptionStatus },
   ]
 
   return (
@@ -28,9 +31,9 @@ export default function PrescriptionsPage() {
           title="Prescriptions"
           description="Manage your prescriptions and medication history"
         />
-        <Button>
-          <Download className="mr-2 h-4 w-4" />
-          Export All
+        <Button onClick={() => setUploadDialogOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Upload PDF
         </Button>
       </div>
 
@@ -63,6 +66,9 @@ export default function PrescriptionsPage() {
 
       {/* Prescriptions List */}
       <PrescriptionList searchTerm={searchTerm} selectedCategory={selectedCategory} />
+
+      {/* Upload Dialog */}
+      <UploadPrescriptionDialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen} />
     </div>
   )
 }

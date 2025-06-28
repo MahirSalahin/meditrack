@@ -4,3 +4,5 @@ venv
 /db/*.db
 .cache/
 .DS_Store
+attensys-dev.json
+uploads
