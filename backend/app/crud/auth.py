@@ -200,7 +200,7 @@ def create_admin_user(register_data: AdminRegisterRequest) -> User:
             session.commit()
             session.refresh(db_user)
             return db_user
-
+            
         except IntegrityError as e:
             session.rollback()
             logger.error(f"Database integrity error creating admin user: {e}")
@@ -212,5 +212,31 @@ def create_admin_user(register_data: AdminRegisterRequest) -> User:
         except Exception as e:
             session.rollback()
             logger.error(f"Error creating admin user: {e}")
+            raise
+
+
+def update_user(user_id: uuid.UUID, user_data: dict) -> Optional[User]:
+    """Update user basic information."""
+    with Session(engine) as session:
+        try:
+            statement = select(User).where(User.id == user_id)
+            db_user = session.exec(statement).first()
+            
+            if not db_user:
+                return None
+            
+            # Update only provided fields
+            for field, value in user_data.items():
+                if hasattr(db_user, field):
+                    setattr(db_user, field, value)
+            
+            session.add(db_user)
+            session.commit()
+            session.refresh(db_user)
+            return db_user
+            
+        except Exception as e:
+            session.rollback()
+            logger.error(f"Error updating user: {e}")
             raise
  

@@ -4,7 +4,6 @@ from datetime import datetime
 import uuid
 from app.models.enums import UserType, BloodGroup, Gender
 from .common import TimestampSchema
-from .profiles import PatientProfileRead, DoctorProfileRead
 
 
 # User Schemas
@@ -119,10 +118,3 @@ class TokenData(BaseModel):
     user_id: Optional[uuid.UUID] = None
     email: Optional[str] = None
     user_type: Optional[str] = None
-
-
-# Combined User with Profile Schemas
-class UserWithProfile(UserRead):
-    patient_profile: Optional[PatientProfileRead] = None
-    doctor_profile: Optional[DoctorProfileRead] = None
- 
