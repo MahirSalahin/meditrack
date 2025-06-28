@@ -145,4 +145,139 @@ def update_doctor_profile(user_id: uuid.UUID, profile_data: DoctorProfileUpdate)
         except Exception as e:
             session.rollback()
             logger.error(f"Error updating doctor profile: {e}")
-            raise 
+            raise
+
+
+# Doctor Search Functions
+def search_doctors(
+    specialization: Optional[str] = None,
+    hospital_affiliation: Optional[str] = None,
+    min_experience: Optional[int] = None,
+    max_fee: Optional[float] = None,
+    is_verified: Optional[bool] = None,
+    location: Optional[str] = None,
+    limit: int = 20,
+    offset: int = 0
+) -> list[DoctorProfile]:
+    """Search doctors with advanced filtering."""
+    try:
+        with Session(engine) as session:
+            # Build query with joins to get user data
+            from app.models.auth import User
+            statement = select(DoctorProfile).join(User)
+            
+            # Add filters
+            if specialization:
+                statement = statement.where(
+                    DoctorProfile.specialization.ilike(f"%{specialization}%")
+                )
+            
+            if hospital_affiliation:
+                statement = statement.where(
+                    DoctorProfile.hospital_affiliation.ilike(f"%{hospital_affiliation}%")
+                )
+            
+            if min_experience is not None:
+                statement = statement.where(
+                    DoctorProfile.years_of_experience >= min_experience
+                )
+            
+            if max_fee is not None:
+                statement = statement.where(
+                    DoctorProfile.consultation_fee <= max_fee
+                )
+            
+            if is_verified is not None:
+                statement = statement.where(
+                    DoctorProfile.is_verified == is_verified
+                )
+            
+            # Filter by active users only
+            statement = statement.where(User.is_active == True)
+            
+            # Add pagination
+            statement = statement.offset(offset).limit(limit)
+            
+            return session.exec(statement).all()
+    except Exception as e:
+        logger.error(f"Error searching doctors: {e}")
+        return []
+
+
+def get_doctor_count(
+    specialization: Optional[str] = None,
+    hospital_affiliation: Optional[str] = None,
+    min_experience: Optional[int] = None,
+    max_fee: Optional[float] = None,
+    is_verified: Optional[bool] = None,
+    location: Optional[str] = None
+) -> int:
+    """Get count of doctors matching search criteria."""
+    try:
+        with Session(engine) as session:
+            from app.models.auth import User
+            from sqlalchemy import func
+            
+            statement = select(func.count(DoctorProfile.id)).join(User)
+            
+            # Add same filters as search
+            if specialization:
+                statement = statement.where(
+                    DoctorProfile.specialization.ilike(f"%{specialization}%")
+                )
+            
+            if hospital_affiliation:
+                statement = statement.where(
+                    DoctorProfile.hospital_affiliation.ilike(f"%{hospital_affiliation}%")
+                )
+            
+            if min_experience is not None:
+                statement = statement.where(
+                    DoctorProfile.years_of_experience >= min_experience
+                )
+            
+            if max_fee is not None:
+                statement = statement.where(
+                    DoctorProfile.consultation_fee <= max_fee
+                )
+            
+            if is_verified is not None:
+                statement = statement.where(
+                    DoctorProfile.is_verified == is_verified
+                )
+            
+            statement = statement.where(User.is_active == True)
+            
+            return session.exec(statement).first() or 0
+    except Exception as e:
+        logger.error(f"Error counting doctors: {e}")
+        return 0
+
+
+# User Profile Management Functions
+def get_user_with_profile(user_id: uuid.UUID) -> Optional[dict]:
+    """Get user with their profile data."""
+    try:
+        with Session(engine) as session:
+            from app.models.auth import User
+            
+            statement = select(User).where(User.id == user_id)
+            user = session.exec(statement).first()
+            
+            if not user:
+                return None
+            
+            # Get profile based on user type
+            profile = None
+            if user.is_patient:
+                profile = get_patient_profile_by_user_id(user_id)
+            elif user.is_doctor:
+                profile = get_doctor_profile_by_user_id(user_id)
+            
+            return {
+                "user": user,
+                "profile": profile
+            }
+    except Exception as e:
+        logger.error(f"Error fetching user with profile: {e}")
+        return None 

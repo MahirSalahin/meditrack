@@ -23,12 +23,17 @@ class AuthMiddleware(BaseHTTPMiddleware):
             "/api/v1/auth/login",
             "/api/v1/auth/register/patient",
             "/api/v1/auth/register/doctor",
+            "/api/v1/profiles/doctors/search",
             "/",
         ]
 
     async def dispatch(self, request: Request, call_next):
         # Skip auth for excluded paths
         if request.url.path in self.exclude_paths:
+            return await call_next(request)
+
+        # Skip auth for doctor profile endpoints (pattern matching)
+        if request.url.path.startswith("/api/v1/profiles/doctors/") and request.method == "GET":
             return await call_next(request)
 
         # Skip auth for static files and OPTIONS requests
