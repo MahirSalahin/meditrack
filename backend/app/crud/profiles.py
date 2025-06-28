@@ -7,6 +7,7 @@ from app.schemas.profiles import (
 )
 from app.db.session import engine
 from typing import Optional
+from datetime import datetime
 import logging
 import uuid
 
@@ -58,6 +59,9 @@ def update_patient_profile(user_id: uuid.UUID, profile_data: PatientProfileUpdat
             update_data = profile_data.model_dump(exclude_unset=True)
             for field, value in update_data.items():
                 setattr(db_profile, field, value)
+            
+            # Update the timestamp
+            db_profile.updated_at = datetime.utcnow()
             
             session.add(db_profile)
             session.commit()
@@ -131,6 +135,9 @@ def update_doctor_profile(user_id: uuid.UUID, profile_data: DoctorProfileUpdate)
             for field, value in update_data.items():
                 setattr(db_profile, field, value)
             
+            # Update the timestamp
+            db_profile.updated_at = datetime.utcnow()
+            
             session.add(db_profile)
             session.commit()
             session.refresh(db_profile)
@@ -193,7 +200,7 @@ def search_doctors(
                 )
             
             # Filter by active users only
-            statement = statement.where(User.is_active == True)
+            statement = statement.where(User.is_active)
             
             # Add pagination
             statement = statement.offset(offset).limit(limit)
@@ -246,7 +253,7 @@ def get_doctor_count(
                     DoctorProfile.is_verified == is_verified
                 )
             
-            statement = statement.where(User.is_active == True)
+            statement = statement.where(User.is_active)
             
             return session.exec(statement).first() or 0
     except Exception as e:
