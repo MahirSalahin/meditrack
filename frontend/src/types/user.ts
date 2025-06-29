@@ -45,46 +45,17 @@ export interface UserWithToken extends User {
   expires_in: number;
 }
 
-export interface PatientProfile {
-  id: string;
-  user_id: string;
-  date_of_birth?: string;
-  gender?: Gender;
-  blood_group?: BloodGroup;
-  emergency_contact_name?: string;
-  emergency_contact_phone?: string;
-  address?: string;
-  insurance_info?: string;
-  allergies?: string;
-  medical_history?: string;
-  age?: number;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface DoctorProfile {
-  id: string;
-  user_id: string;
-  medical_license_number: string;
-  license_expiry_date?: string;
-  specialization: string;
-  years_of_experience?: number;
-  hospital_affiliation?: string;
-  education_background?: string;
-  consultation_fee?: number;
-  available_days?: string;
-  bio?: string;
-  is_verified: boolean;
-  is_license_valid: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface UserWithProfile {
-  user: User;
-  patient_profile?: PatientProfile;
-  doctor_profile?: DoctorProfile;
-}
+// Import profile types to avoid duplication
+export type {
+  UserWithProfile,
+  PatientProfile,
+  DoctorProfile,
+  UserProfileUpdate,
+  PatientProfileUpdate,
+  DoctorProfileUpdate,
+  DoctorSearchParams,
+  DoctorSearchResponse
+} from './profile'
 
 export interface LoginRequest {
   email: string;
@@ -142,28 +113,4 @@ export interface UserUpdate {
   phone?: string;
   is_active?: boolean;
   is_verified?: boolean;
-}
-
-export interface PatientProfileUpdate {
-  date_of_birth?: string;
-  gender?: Gender;
-  blood_group?: BloodGroup;
-  emergency_contact_name?: string;
-  emergency_contact_phone?: string;
-  address?: string;
-  insurance_info?: string;
-  allergies?: string;
-  medical_history?: string;
-}
-
-export interface DoctorProfileUpdate {
-  medical_license_number?: string;
-  license_expiry_date?: string;
-  specialization?: string;
-  years_of_experience?: number;
-  hospital_affiliation?: string;
-  education_background?: string;
-  consultation_fee?: number;
-  available_days?: string;
-  bio?: string;
 }

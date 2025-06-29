@@ -9,10 +9,10 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { User, Edit, Save, Camera, X, Phone, Heart } from "lucide-react"
-import { useProfile, useUpdateProfile, ProfileUpdateData } from "@/lib/api/profile.service"
+import { useProfile, useUpdateProfile } from "@/lib/api/profile.service"
 import { ProfileSkeleton } from "@/components/skeletons/patient/profile.skeleton"
 import TitleHeader from "@/components/title-header"
-import { BloodGroup, Gender } from "@/types/user"
+import { BloodGroup, Gender, UserProfileUpdate } from "@/types/user"
 import { format } from "date-fns"
 
 // Helper function to safely format dates
@@ -35,7 +35,7 @@ export default function ProfilePage() {
     watch,
     formState: { errors, isDirty },
     reset
-  } = useForm<ProfileUpdateData>()
+  } = useForm<UserProfileUpdate>()
 
   // Extract user and patient profile data
   const user = profileData?.user
@@ -61,7 +61,7 @@ export default function ProfilePage() {
     }
   }, [user, patientProfile, reset])
 
-  const onSubmit = async (data: ProfileUpdateData) => {
+  const onSubmit = async (data: UserProfileUpdate) => {
     try {
       await updateProfile.mutateAsync(data)
       setIsEditing(false)
