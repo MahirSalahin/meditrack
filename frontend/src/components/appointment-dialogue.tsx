@@ -31,8 +31,9 @@ import {
 } from "@/components/ui/select"
 import { useCreateAppointment, useUpdateAppointment } from "@/lib/api/appointment.service"
 import { AppointmentRead, AppointmentType } from "@/types/appointment"
-import { useEffect } from "react"
-import { CalendarIcon } from "lucide-react"
+import { DoctorSearchResult } from "@/types/profile"
+import { useEffect, useState } from "react"
+import { CalendarIcon, User } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import {
     Popover,
@@ -41,6 +42,9 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
+import { DoctorSearch } from "@/components/doctor-search"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 const AppointmentSchema = z.object({
     doctor_id: z.string().min(1, "Doctor is required"),
@@ -67,6 +71,8 @@ export function AppointmentDialog({
 }: AppointmentDialogProps) {
     const { mutateAsync: createAppointment, isPending: isCreating } = useCreateAppointment()
     const { mutateAsync: updateAppointment, isPending: isUpdating } = useUpdateAppointment()
+    const [selectedDoctor, setSelectedDoctor] = useState<DoctorSearchResult | null>(null)
+    const [showDoctorSearch, setShowDoctorSearch] = useState(false)
 
     const form = useForm<z.infer<typeof AppointmentSchema>>({
         resolver: zodResolver(AppointmentSchema),
@@ -99,6 +105,12 @@ export function AppointmentDialog({
         }
     }, [appointment, doctorId, form])
 
+    const handleDoctorSelect = (doctor: DoctorSearchResult) => {
+        setSelectedDoctor(doctor)
+        form.setValue("doctor_id", doctor.id)
+        setShowDoctorSearch(false)
+    }
+
     async function onSubmit(values: z.infer<typeof AppointmentSchema>) {
         try {
             if (appointment) {
@@ -122,6 +134,7 @@ export function AppointmentDialog({
             }
 
             form.reset()
+            setSelectedDoctor(null)
             onOpenChange(false)
         } catch (error) {
             // Error handling is done in the mutation hooks
@@ -134,7 +147,7 @@ export function AppointmentDialog({
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>
@@ -143,23 +156,76 @@ export function AppointmentDialog({
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        {/* Doctor Selection */}
                         <FormField
                             control={form.control}
                             name="doctor_id"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Doctor ID</FormLabel>
+                                    <FormLabel>Select Doctor</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            placeholder="Enter doctor ID"
-                                            {...field}
-                                            disabled={!!doctorId} // Disable if doctor is pre-selected
-                                        />
+                                        <div className="space-y-2">
+                                            {selectedDoctor ? (
+                                                <Card className="cursor-pointer" onClick={() => setShowDoctorSearch(true)}>
+                                                    <CardContent className="p-3">
+                                                        <div className="flex items-center space-x-3">
+                                                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                                                <User className="h-5 w-5 text-primary" />
+                                                            </div>
+                                                            <div className="flex-1">
+                                                                <h4 className="font-medium text-sm">{selectedDoctor.doctor_name}</h4>
+                                                                <p className="text-xs text-muted-foreground">{selectedDoctor.specialization}</p>
+                                                                {selectedDoctor.hospital_affiliation && (
+                                                                    <p className="text-xs text-muted-foreground">{selectedDoctor.hospital_affiliation}</p>
+                                                                )}
+                                                            </div>
+                                                            {selectedDoctor.is_verified && (
+                                                                <Badge variant="default" className="text-xs">
+                                                                    Verified
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                    </CardContent>
+                                                </Card>
+                                            ) : (
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    className="w-full justify-start"
+                                                    onClick={() => setShowDoctorSearch(true)}
+                                                >
+                                                    <User className="mr-2 h-4 w-4" />
+                                                    Search and select a doctor
+                                                </Button>
+                                            )}
+                                            <input type="hidden" {...field} />
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
+
+                        {/* Doctor Search Dialog */}
+                        {showDoctorSearch && (
+                            <div className="border rounded-lg p-4 bg-muted/50">
+                                <div className="flex items-center justify-between mb-3">
+                                    <h3 className="font-medium">Search Doctors</h3>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => setShowDoctorSearch(false)}
+                                    >
+                                        Close
+                                    </Button>
+                                </div>
+                                <DoctorSearch
+                                    onDoctorSelect={handleDoctorSelect}
+                                    selectedDoctorId={selectedDoctor?.id}
+                                />
+                            </div>
+                        )}
 
                         <FormField
                             control={form.control}
