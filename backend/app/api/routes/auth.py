@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, status
+from fastapi.requests import Request
 from app.schemas.auth import (
     LoginRequest, 
     PatientRegisterRequest, 
@@ -15,8 +16,6 @@ from app.crud.auth import (
 )
 from app.utils.auth import verify_password, create_access_token, get_token_expires_in
 from app.db.session import SessionDep
-from app.middleware.auth import get_current_admin_user
-from app.models.auth import User
 import logging
 
 logger = logging.getLogger(__name__)
@@ -170,10 +169,18 @@ async def register_doctor(
 @router.post("/register/admin", response_model=UserRead)
 async def register_admin(
     register_data: AdminRegisterRequest,
-    session: SessionDep,
-    current_admin: User = Depends(get_current_admin_user)
+    request: Request
 ):
     """Register a new system admin. Only accessible by existing admins."""
+    current_user = request.state.user
+    
+    # Check if current user is admin
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+    
     # Check if user already exists
     existing_user = get_user_by_email(register_data.email)
     if existing_user:

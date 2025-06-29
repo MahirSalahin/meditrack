@@ -12,8 +12,7 @@ from .auth import (
     LoginRequest,
     PatientRegisterRequest,
     DoctorRegisterRequest,
-    AdminRegisterRequest,
-    UserWithProfile
+    AdminRegisterRequest
 )
 
 from .profiles import (
@@ -78,7 +77,6 @@ __all__ = [
     "PatientRegisterRequest",
     "DoctorRegisterRequest",
     "AdminRegisterRequest",
-    "UserWithProfile",
     
     # Enums
     "UserType",

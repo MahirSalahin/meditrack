@@ -27,7 +27,7 @@ interface AdvancedSearchFilters {
 }
 
 export default function AppointmentsPage() {
-  const [selectedFilter, setSelectedFilter] = useState("upcoming")
+  const [selectedFilter, setSelectedFilter] = useState("all")
   const [isAppointmentDialogOpen, setIsAppointmentDialogOpen] = useState(false)
   const [searchFilters, setSearchFilters] = useState<AdvancedSearchFilters>({
     searchTerm: "",
@@ -115,7 +115,7 @@ export default function AppointmentsPage() {
 
       {/* Quick Filter Buttons */}
       <div className="flex gap-2">
-        {["upcoming", "past", "pending", "all"].map((filter) => (
+        {["all", "past", "pending"].map((filter) => (
           <Button
             key={filter}
             variant={selectedFilter === filter ? "default" : "outline"}
