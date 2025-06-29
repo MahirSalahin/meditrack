@@ -2,8 +2,10 @@ from sqlmodel import Session, select
 from sqlalchemy.exc import IntegrityError
 from app.models.profiles import PatientProfile, DoctorProfile
 from app.schemas.profiles import (
-    PatientProfileCreate, PatientProfileUpdate,
-    DoctorProfileCreate, DoctorProfileUpdate
+    PatientProfileCreate,
+    PatientProfileUpdate,
+    DoctorProfileCreate,
+    DoctorProfileUpdate,
 )
 from app.db.session import engine
 from typing import Optional
@@ -45,24 +47,26 @@ def create_patient_profile(profile_data: PatientProfileCreate) -> PatientProfile
             raise
 
 
-def update_patient_profile(user_id: uuid.UUID, profile_data: PatientProfileUpdate) -> Optional[PatientProfile]:
+def update_patient_profile(
+    user_id: uuid.UUID, profile_data: PatientProfileUpdate
+) -> Optional[PatientProfile]:
     """Update patient profile by user ID."""
     with Session(engine) as session:
         try:
             statement = select(PatientProfile).where(PatientProfile.user_id == user_id)
             db_profile = session.exec(statement).first()
-            
+
             if not db_profile:
                 return None
-            
+
             # Update only provided fields
             update_data = profile_data.model_dump(exclude_unset=True)
             for field, value in update_data.items():
                 setattr(db_profile, field, value)
-            
+
             # Update the timestamp
             db_profile.updated_at = datetime.utcnow()
-            
+
             session.add(db_profile)
             session.commit()
             session.refresh(db_profile)
@@ -120,24 +124,26 @@ def create_doctor_profile(profile_data: DoctorProfileCreate) -> DoctorProfile:
             raise
 
 
-def update_doctor_profile(user_id: uuid.UUID, profile_data: DoctorProfileUpdate) -> Optional[DoctorProfile]:
+def update_doctor_profile(
+    user_id: uuid.UUID, profile_data: DoctorProfileUpdate
+) -> Optional[DoctorProfile]:
     """Update doctor profile by user ID."""
     with Session(engine) as session:
         try:
             statement = select(DoctorProfile).where(DoctorProfile.user_id == user_id)
             db_profile = session.exec(statement).first()
-            
+
             if not db_profile:
                 return None
-            
+
             # Update only provided fields
             update_data = profile_data.model_dump(exclude_unset=True)
             for field, value in update_data.items():
                 setattr(db_profile, field, value)
-            
+
             # Update the timestamp
             db_profile.updated_at = datetime.utcnow()
-            
+
             session.add(db_profile)
             session.commit()
             session.refresh(db_profile)
@@ -163,48 +169,60 @@ def search_doctors(
     max_fee: Optional[float] = None,
     is_verified: Optional[bool] = None,
     location: Optional[str] = None,
+    name: Optional[str] = None,
     limit: int = 20,
-    offset: int = 0
+    offset: int = 0,
 ) -> list[DoctorProfile]:
     """Search doctors with advanced filtering."""
     try:
         with Session(engine) as session:
             # Build query with joins to get user data
             from app.models.auth import User
+
             statement = select(DoctorProfile).join(User)
-            
+
             # Add filters
             if specialization:
                 statement = statement.where(
                     DoctorProfile.specialization.ilike(f"%{specialization}%")
                 )
-            
+
             if hospital_affiliation:
                 statement = statement.where(
-                    DoctorProfile.hospital_affiliation.ilike(f"%{hospital_affiliation}%")
+                    DoctorProfile.hospital_affiliation.ilike(
+                        f"%{hospital_affiliation}%"
+                    )
                 )
-            
+
             if min_experience is not None:
                 statement = statement.where(
                     DoctorProfile.years_of_experience >= min_experience
                 )
-            
+
             if max_fee is not None:
-                statement = statement.where(
-                    DoctorProfile.consultation_fee <= max_fee
-                )
-            
+                statement = statement.where(DoctorProfile.consultation_fee <= max_fee)
+
             if is_verified is not None:
+                statement = statement.where(DoctorProfile.is_verified == is_verified)
+
+            # Add name search filter
+            if name:
+                from sqlalchemy import or_
+
                 statement = statement.where(
-                    DoctorProfile.is_verified == is_verified
+                    or_(
+                        User.first_name.ilike(f"%{name}%"),
+                        User.last_name.ilike(f"%{name}%"),
+                        (User.first_name + " " + User.last_name).ilike(f"%{name}%"),
+                    )
                 )
-            
+
             # Filter by active users only
             statement = statement.where(User.is_active)
-            
+
             # Add pagination
             statement = statement.offset(offset).limit(limit)
-            
+
             return session.exec(statement).all()
     except Exception as e:
         logger.error(f"Error searching doctors: {e}")
@@ -217,44 +235,53 @@ def get_doctor_count(
     min_experience: Optional[int] = None,
     max_fee: Optional[float] = None,
     is_verified: Optional[bool] = None,
-    location: Optional[str] = None
+    location: Optional[str] = None,
+    name: Optional[str] = None,
 ) -> int:
     """Get count of doctors matching search criteria."""
     try:
         with Session(engine) as session:
             from app.models.auth import User
-            from sqlalchemy import func
-            
+            from sqlalchemy import func, or_
+
             statement = select(func.count(DoctorProfile.id)).join(User)
-            
+
             # Add same filters as search
             if specialization:
                 statement = statement.where(
                     DoctorProfile.specialization.ilike(f"%{specialization}%")
                 )
-            
+
             if hospital_affiliation:
                 statement = statement.where(
-                    DoctorProfile.hospital_affiliation.ilike(f"%{hospital_affiliation}%")
+                    DoctorProfile.hospital_affiliation.ilike(
+                        f"%{hospital_affiliation}%"
+                    )
                 )
-            
+
             if min_experience is not None:
                 statement = statement.where(
                     DoctorProfile.years_of_experience >= min_experience
                 )
-            
+
             if max_fee is not None:
-                statement = statement.where(
-                    DoctorProfile.consultation_fee <= max_fee
-                )
-            
+                statement = statement.where(DoctorProfile.consultation_fee <= max_fee)
+
             if is_verified is not None:
+                statement = statement.where(DoctorProfile.is_verified == is_verified)
+
+            # Add name search filter
+            if name:
                 statement = statement.where(
-                    DoctorProfile.is_verified == is_verified
+                    or_(
+                        User.first_name.ilike(f"%{name}%"),
+                        User.last_name.ilike(f"%{name}%"),
+                        (User.first_name + " " + User.last_name).ilike(f"%{name}%"),
+                    )
                 )
-            
+
             statement = statement.where(User.is_active)
-            
+
             return session.exec(statement).first() or 0
     except Exception as e:
         logger.error(f"Error counting doctors: {e}")
@@ -267,24 +294,21 @@ def get_user_with_profile(user_id: uuid.UUID) -> Optional[dict]:
     try:
         with Session(engine) as session:
             from app.models.auth import User
-            
+
             statement = select(User).where(User.id == user_id)
             user = session.exec(statement).first()
-            
+
             if not user:
                 return None
-            
+
             # Get profile based on user type
             profile = None
             if user.is_patient:
                 profile = get_patient_profile_by_user_id(user_id)
             elif user.is_doctor:
                 profile = get_doctor_profile_by_user_id(user_id)
-            
-            return {
-                "user": user,
-                "profile": profile
-            }
+
+            return {"user": user, "profile": profile}
     except Exception as e:
         logger.error(f"Error fetching user with profile: {e}")
-        return None 
+        return None
