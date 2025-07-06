@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - MediTrack Patient Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Same sidebar structure -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+                </svg>
+                <span>MediTrack</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="patient-dashboard.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Dashboard
+            </a>
+            <a href="patient-appointments.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Appointments
+            </a>
+            <a href="patient-medications.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                    <rect x="9" y="9" width="6" height="6"></rect>
+                    <path d="m15 2-3 3-3-3"></path>
+                </svg>
+                Medications
+            </a>
+            <a href="patient-prescriptions.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14,2 14,8 20,8"></polyline>
+                </svg>
+                Prescriptions
+            </a>
+            <a href="patient-records.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                Records
+            </a>
+            <a href="patient-profile.html" class="nav-link active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Profile
+            </a>
+            <a href="patient-settings.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6"></path>
+                </svg>
+                Settings
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">JD</div>
+                <div class="user-info">
+                    <span class="user-name">John Doe</span>
+                    <span class="user-role">Patient</span>
+                </div>
+            </div>
+            <button class="logout-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16,17 21,12 16,7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Profile</h1>
+                <p>Manage your profile information</p>
+            </div>
+            <button class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                Edit Profile
+            </button>
+        </div>
+
+        <!-- Profile Content Grid -->
+        <div class="profile-grid">
+            <!-- Personal Information -->
+            <div class="profile-section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Personal Information</h3>
+                        <p>Your basic personal details</p>
+                    </div>
+                    <div class="card-content">
+                        <!-- Profile Picture -->
+                        <div class="profile-picture-section">
+                            <div class="profile-picture">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div class="profile-info">
+                                <h3>John Doe</h3>
+                                <p>Patient ID: PAT-001</p>
+                                <p>Member since January 2024</p>
+                                <div class="status-badge verified">
+                                    <span>Verified</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Fields -->
+                        <form class="profile-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>First Name</label>
+                                    <input type="text" value="John" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label>Last Name</label>
+                                    <input type="text" value="Doe" disabled>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Email Address</label>
+                                    <input type="email" value="john.doe@email.com" disabled>
+                                    <small>Email cannot be changed</small>
+                                </div>
+                                <div class="form-group">
+                                    <label>Phone Number</label>
+                                    <input type="tel" value="+1 (555) 123-4567" disabled>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Date of Birth</label>
+                                    <input type="date" value="1985-06-15" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <select disabled>
+                                        <option>Male</option>
+                                        <option>Female</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Address</label>
+                                <textarea disabled>123 Main Street, City, State 12345</textarea>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Medical Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Medical Information</h3>
+                        <p>Your health details and medical history</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Blood Type</label>
+                                <select disabled>
+                                    <option>A+</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Age</label>
+                                <input type="text" value="38 years" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Allergies</label>
+                            <textarea disabled>Penicillin, Shellfish</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Medical History</label>
+                            <textarea disabled>Hypertension (2020), Type 2 Diabetes (2022)</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="profile-sidebar">
+                <!-- Emergency Contact -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Emergency Contact</h3>
+                        <p>Contact information for emergencies</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label>Contact Name</label>
+                            <input type="text" value="Jane Doe" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Contact Phone</label>
+                            <input type="tel" value="+1 (555) 987-6543" disabled>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insurance Information -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Insurance Information</h3>
+                        <p>Your insurance details</p>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label>Insurance Details</label>
+                            <textarea disabled>BlueCross BlueShield
+Policy: BC123456789
+Group: 12345</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Account Status -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Account Status</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="status-list">
+                            <div class="status-item">
+                                <span>Account Status</span>
+                                <div class="status-badge active">Active</div>
+                            </div>
+                            <div class="status-item">
+                                <span>Email Verified</span>
+                                <div class="status-badge verified">Verified</div>
+                            </div>
+                            <div class="status-item">
+                                <span>User Type</span>
+                                <span>Patient</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

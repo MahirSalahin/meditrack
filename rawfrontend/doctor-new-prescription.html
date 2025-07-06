@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Prescription - MediTrack Doctor Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="doctor-styles.css">
+    <style>
+        /* Prescription-specific styles */
+        .prescription-form {
+            max-width: 210mm; /* A4 width */
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .prescription-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .prescription-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/><path d="M30 50 L45 65 L70 35" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="3"/></svg>') repeat;
+            opacity: 0.1;
+        }
+
+        .prescription-content {
+            padding: 2rem;
+            position: relative;
+        }
+
+        .rx-symbol {
+            font-size: 4rem;
+            font-weight: bold;
+            color: #2563eb;
+            font-family: serif;
+            position: absolute;
+            top: 1rem;
+            right: 2rem;
+            opacity: 0.1;
+        }
+
+        .doctor-info {
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .patient-info {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .medication-entry {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            background: #fefefe;
+            position: relative;
+        }
+
+        .medication-entry::before {
+            content: 'Rx';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: white;
+            color: #2563eb;
+            font-weight: bold;
+            padding: 0 8px;
+            font-size: 14px;
+        }
+
+        .prescription-footer {
+            border-top: 2px solid #e2e8f0;
+            padding-top: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .signature-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .signature-box {
+            border: 1px dashed #cbd5e1;
+            border-radius: 4px;
+            padding: 2rem;
+            text-align: center;
+            background: #f8fafc;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .prescription-number {
+            background: #2563eb;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .medication-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .medication-full-width {
+            grid-column: span 2;
+        }
+
+        .prescription-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .prescription-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .prescription-textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .drug-search {
+            position: relative;
+        }
+
+        .drug-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+
+        .drug-suggestion {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: background-color 0.2s ease;
+        }
+
+        .drug-suggestion:hover {
+            background-color: #f8fafc;
+        }
+
+        .drug-suggestion:last-child {
+            border-bottom: none;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 6rem;
+            color: rgba(37, 99, 235, 0.05);
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .validity-notice {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.875rem;
+            color: #92400e;
+        }
+
+        .prescription-controls {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            z-index: 20;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        @media print {
+            .prescription-controls,
+            .control-buttons {
+                display: none;
+            }
+            
+            .prescription-form {
+                box-shadow: none;
+                margin: 0;
+            }
+            
+            .prescription-content {
+                padding: 1rem;
+            }
+        }
+
+        .dosage-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .quick-dosage {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 0.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.75rem;
+        }
+
+        .quick-dosage:hover {
+            background: #e2e8f0;
+            border-color: #2563eb;
+        }
+
+        .refill-section {
+            background: #f0f9ff;
+            border: 1px solid #0284c7;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .generic-substitution {
+            background: #ecfdf5;
+            border: 1px solid #10b981;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+                </svg>
+                <span>MediTrack</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="doctor-dashboard.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Dashboard
+            </a>
+            <a href="doctor-patients.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="m22 21-3-3m0 0-3-3m3 3 3-3m-3 3-3 3"></path>
+                </svg>
+                Patients
+            </a>
+            <a href="doctor-appointments.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Appointments
+            </a>
+            <a href="doctor-new-prescription.html" class="nav-link active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="m18.5 2.5 1 1L11 12l-4 1 1-4 8.5-8.5z"></path>
+                </svg>
+                New Prescription
+            </a>
+            <a href="doctor-profile.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Profile
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">DS</div>
+                <div class="user-info">
+                    <span class="user-name">Dr. Smith</span>
+                    <span class="user-role">Doctor</span>
+                </div>
+            </div>
+            <button class="logout-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16,17 21,12 16,7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Controls -->
+        <div class="prescription-controls">
+            <div class="control-buttons">
+                <button class="btn btn-outline btn-sm">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16,17 21,12 16,7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Back to Patients
+                </button>
+                <button class="btn btn-outline btn-sm">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path>
+                        <circle cx="12" cy="13" r="3"></circle>
+                    </svg>
+                    Save Draft
+                </button>
+                <button class="btn btn-outline btn-sm">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6,9 6,2 18,2 18,9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Print Preview
+                </button>
+                <button class="btn btn-primary btn-sm">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7,10 12,15 17,10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Send Prescription
+                </button>
+            </div>
+        </div>
+
+        <!-- Prescription Form -->
+        <div class="prescription-form">
+            <!-- Watermark -->
+            <div class="watermark">MEDITRACK</div>
+
+            <!-- Header -->
+            <div class="prescription-header">
+                <div style="position: relative; z-index: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h1 style="font-size: 1.875rem; font-weight: bold; margin-bottom: 0.5rem;">PRESCRIPTION</h1>
+                            <div class="prescription-number">Rx # MT-2024-001234</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.875rem; opacity: 0.9;">Date Issued</div>
+                            <div style="font-size: 1.125rem; font-weight: 600;">February 24, 2024</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="prescription-content">
+                <div class="rx-symbol">℞</div>
+
+                <!-- Doctor Information -->
+                <div class="doctor-info">
+                    <h2 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; color: #1e293b;">Prescribing Physician</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <div style="margin-bottom: 0.5rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Doctor Name</label>
+                                <input type="text" class="prescription-input" value="Dr. Sarah Johnson, MD" readonly>
+                            </div>
+                            <div style="margin-bottom: 0.5rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Specialization</label>
+                                <input type="text" class="prescription-input" value="Cardiology" readonly>
+                            </div>
+                            <div style="margin-bottom: 0.5rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Medical License No.</label>
+                                <input type="text" class="prescription-input" value="MD123456" readonly>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="margin-bottom: 0.5rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Hospital/Clinic</label>
+                                <input type="text" class="prescription-input" value="New York Medical Center" readonly>
+                            </div>
+                            <div style="margin-bottom: 0.5rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Phone</label>
+                                <input type="text" class="prescription-input" value="+1 (555) 123-4567" readonly>
+                            </div>
+                            <div style="margin-bottom: 0.5rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">DEA Number</label>
+                                <input type="text" class="prescription-input" value="AS1234567" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Patient Information -->
+                <div class="patient-info">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; color: #1e293b;">Patient Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div>
+                            <div style="margin-bottom: 0.75rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Patient Name *</label>
+                                <input type="text" class="prescription-input" placeholder="Enter patient's full name" required>
+                            </div>
+                            <div style="margin-bottom: 0.75rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Date of Birth *</label>
+                                <input type="date" class="prescription-input" required>
+                            </div>
+                            <div style="margin-bottom: 0.75rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Gender</label>
+                                <select class="prescription-input">
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="margin-bottom: 0.75rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Patient ID</label>
+                                <input type="text" class="prescription-input" placeholder="Enter patient ID">
+                            </div>
+                            <div style="margin-bottom: 0.75rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Address</label>
+                                <input type="text" class="prescription-input" placeholder="Enter patient address">
+                            </div>
+                            <div style="margin-bottom: 0.75rem;">
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Phone Number</label>
+                                <input type="tel" class="prescription-input" placeholder="Enter phone number">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medications -->
+                <div>
+                    <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; color: #1e293b;">Medications Prescribed</h3>
+                    
+                    <!-- Medication 1 -->
+                    <div class="medication-entry">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Drug Name (Generic/Brand) *</label>
+                            <div class="drug-search">
+                                <input type="text" class="prescription-input" placeholder="Search and select medication..." required>
+                                <div class="drug-suggestions">
+                                    <div class="drug-suggestion">
+                                        <strong>Lisinopril</strong> (ACE Inhibitor)<br>
+                                        <small>Generic for Prinivil, Zestril</small>
+                                    </div>
+                                    <div class="drug-suggestion">
+                                        <strong>Metformin</strong> (Antidiabetic)<br>
+                                        <small>Generic for Glucophage</small>
+                                    </div>
+                                    <div class="drug-suggestion">
+                                        <strong>Atorvastatin</strong> (Statin)<br>
+                                        <small>Generic for Lipitor</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="medication-grid">
+                            <div>
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Strength/Dosage *</label>
+                                <input type="text" class="prescription-input" placeholder="e.g., 10mg, 500mg" required>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Dosage Form</label>
+                                <select class="prescription-input">
+                                    <option value="">Select Form</option>
+                                    <option value="tablet">Tablet</option>
+                                    <option value="capsule">Capsule</option>
+                                    <option value="syrup">Syrup</option>
+                                    <option value="injection">Injection</option>
+                                    <option value="cream">Cream</option>
+                                    <option value="drops">Drops</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Quantity *</label>
+                                <input type="number" class="prescription-input" placeholder="Number of units" required>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Days Supply</label>
+                                <input type="number" class="prescription-input" placeholder="e.g., 30, 90">
+                            </div>
+                        </div>
+
+                        <div style="margin: 1rem 0;">
+                            <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Sig (Directions for Use) *</label>
+                            <textarea class="prescription-input prescription-textarea" placeholder="Take 1 tablet by mouth once daily with food for blood pressure. Continue until follow-up appointment." required></textarea>
+                        </div>
+
+                        <!-- Quick Dosage Options -->
+                        <div style="margin: 1rem 0;">
+                            <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.5rem;">Quick Dosage Instructions</label>
+                            <div class="dosage-grid">
+                                <div class="quick-dosage">Once daily</div>
+                                <div class="quick-dosage">Twice daily</div>
+                                <div class="quick-dosage">Three times daily</div>
+                                <div class="quick-dosage">Four times daily</div>
+                                <div class="quick-dosage">Every 4 hours</div>
+                                <div class="quick-dosage">Every 6 hours</div>
+                                <div class="quick-dosage">Every 8 hours</div>
+                                <div class="quick-dosage">Every 12 hours</div>
+                                <div class="quick-dosage">As needed (PRN)</div>
+                            </div>
+                        </div>
+
+                        <!-- Refill Information -->
+                        <div class="refill-section">
+                            <div class="medication-grid">
+                                <div>
+                                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #0c4a6e; margin-bottom: 0.25rem;">Number of Refills</label>
+                                    <select class="prescription-input">
+                                        <option value="0">No Refills</option>
+                                        <option value="1">1 Refill</option>
+                                        <option value="2">2 Refills</option>
+                                        <option value="3">3 Refills</option>
+                                        <option value="4">4 Refills</option>
+                                        <option value="5">5 Refills</option>
+                                        <option value="6">6 Refills</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #0c4a6e; margin-bottom: 0.25rem;">Refills Valid Until</label>
+                                    <input type="date" class="prescription-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generic Substitution -->
+                        <div class="generic-substitution">
+                            <label style="display: flex; align-items: center; font-size: 0.875rem; font-weight: 500; color: #065f46;">
+                                <input type="checkbox" style="margin-right: 0.5rem;" checked>
+                                Generic substitution permitted (unless specified otherwise)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Add More Medication Button -->
+                    <button type="button" class="btn btn-outline" style="margin-bottom: 2rem;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Another Medication
+                    </button>
+                </div>
+
+                <!-- Clinical Information -->
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; color: #1e293b;">Clinical Information</h3>
+                    <div class="medication-grid">
+                        <div>
+                            <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Diagnosis/Indication</label>
+                            <input type="text" class="prescription-input" placeholder="e.g., Hypertension, Type 2 Diabetes">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">ICD-10 Code</label>
+                            <input type="text" class="prescription-input" placeholder="e.g., I10, E11">
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Additional Notes/Instructions</label>
+                        <textarea class="prescription-input prescription-textarea" placeholder="Any additional instructions for the patient or pharmacist..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Validity Notice -->
+                <div class="validity-notice">
+                    <strong>Important:</strong> This prescription is valid for 12 months from the date of issue unless otherwise specified. Controlled substances have different validity periods as per regulations.
+                </div>
+
+                <!-- Footer/Signature Section -->
+                <div class="prescription-footer">
+                    <div class="signature-section">
+                        <div class="signature-box">
+                            <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 0.5rem;">Doctor's Signature</div>
+                            <div style="font-style: italic; color: #94a3b8;">Dr. Sarah Johnson</div>
+                            <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem;">Digitally Signed</div>
+                        </div>
+                        <div class="signature-box">
+                            <div style="font-size: 0.875rem; color: #64748b; margin-bottom: 0.5rem;">Date & Time</div>
+                            <div style="font-weight: 600;">February 24, 2024</div>
+                            <div style="font-size: 0.875rem; color: #64748b;">2:30 PM EST</div>
+                        </div>
+                    </div>
+
+                    <!-- Legal Footer -->
+                    <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.75rem; color: #64748b; text-align: center;">
+                        <p>This prescription was generated electronically by MediTrack EMR System</p>
+                        <p>For verification, contact New York Medical Center at +1 (555) 123-4567</p>
+                        <p style="margin-top: 0.5rem;">
+                            <strong>For Pharmacy Use:</strong> Prescription verification required | 
+                            Patient counseling completed: □ | 
+                            Pharmacist: _______________
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple interactivity for demo purposes
+        document.addEventListener('DOMContentLoaded', function() {
+            // Drug search suggestions
+            const drugSearch = document.querySelector('.drug-search input');
+            const suggestions = document.querySelector('.drug-suggestions');
+            
+            drugSearch.addEventListener('focus', function() {
+                suggestions.style.display = 'block';
+            });
+            
+            drugSearch.addEventListener('blur', function() {
+                setTimeout(() => {
+                    suggestions.style.display = 'none';
+                }, 200);
+            });
+            
+            // Quick dosage selection
+            const quickDosages = document.querySelectorAll('.quick-dosage');
+            const sigTextarea = document.querySelector('.prescription-textarea');
+            
+            quickDosages.forEach(dosage => {
+                dosage.addEventListener('click', function() {
+                    const currentText = sigTextarea.value;
+                    if (!currentText.includes(this.textContent)) {
+                        sigTextarea.value = currentText + (currentText ? ' ' : '') + this.textContent;
+                    }
+                });
+            });
+            
+            // Drug suggestions selection
+            const suggestionItems = document.querySelectorAll('.drug-suggestion');
+            
+            suggestionItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const drugName = this.querySelector('strong').textContent;
+                    drugSearch.value = drugName;
+                    suggestions.style.display = 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

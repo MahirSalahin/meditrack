@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medications - MediTrack Patient Portal</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Same sidebar structure -->
+    <div class="sidebar">
+        <!-- Sidebar content same as previous pages but with medications active -->
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+                </svg>
+                <span>MediTrack</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="patient-dashboard.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Dashboard
+            </a>
+            <a href="patient-appointments.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Appointments
+            </a>
+            <a href="patient-medications.html" class="nav-link active">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                    <rect x="9" y="9" width="6" height="6"></rect>
+                    <path d="m15 2-3 3-3-3"></path>
+                </svg>
+                Medications
+            </a>
+            <a href="patient-prescriptions.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14,2 14,8 20,8"></polyline>
+                </svg>
+                Prescriptions
+            </a>
+            <a href="patient-records.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                </svg>
+                Records
+            </a>
+            <a href="patient-profile.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Profile
+            </a>
+            <a href="patient-settings.html" class="nav-link">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M12 1v6m0 6v6"></path>
+                </svg>
+                Settings
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">JD</div>
+                <div class="user-info">
+                    <span class="user-name">John Doe</span>
+                    <span class="user-role">Patient</span>
+                </div>
+            </div>
+            <button class="logout-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16,17 21,12 16,7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Medications</h1>
+                <p>Track your medications and stay on schedule</p>
+            </div>
+            <button class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Medication
+            </button>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="action-card due">
+                <div class="action-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12,6 12,12 16,14"></polyline>
+                    </svg>
+                </div>
+                <div class="action-content">
+                    <h4>2 medications due now</h4>
+                    <p>Take your scheduled medications</p>
+                </div>
+                <button class="btn btn-primary btn-sm">Take Now</button>
+            </div>
+            
+            <div class="action-card reminder">
+                <div class="action-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
+                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
+                    </svg>
+                </div>
+                <div class="action-content">
+                    <h4>Set Reminders</h4>
+                    <p>Never miss a dose again</p>
+                </div>
+                <button class="btn btn-outline btn-sm">Configure</button>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="medications-grid">
+            <!-- Medications List -->
+            <div class="medications-section">
+                <div class="section-header">
+                    <h3>Current Medications</h3>
+                    <div class="search-bar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" placeholder="Search medications...">
+                    </div>
+                </div>
+
+                <div class="medications-list">
+                    <div class="medication-card">
+                        <div class="medication-header">
+                            <div class="medication-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                                    <rect x="9" y="9" width="6" height="6"></rect>
+                                    <path d="m15 2-3 3-3-3"></path>
+                                </svg>
+                            </div>
+                            <div class="medication-info">
+                                <h4>Lisinopril</h4>
+                                <p>10mg • Once daily</p>
+                                <p class="medication-type">ACE Inhibitor</p>
+                            </div>
+                            <div class="medication-status active">
+                                <span>Active</span>
+                            </div>
+                        </div>
+                        <div class="medication-schedule">
+                            <div class="schedule-time">
+                                <span class="time">9:00 AM</span>
+                                <span class="next-dose">Next dose in 3 hours</span>
+                            </div>
+                            <div class="medication-actions">
+                                <button class="btn btn-success btn-sm">Mark Taken</button>
+                                <button class="btn btn-outline btn-sm">Skip</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="medication-card">
+                        <div class="medication-header">
+                            <div class="medication-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                                    <rect x="9" y="9" width="6" height="6"></rect>
+                                    <path d="m15 2-3 3-3-3"></path>
+                                </svg>
+                            </div>
+                            <div class="medication-info">
+                                <h4>Metformin</h4>
+                                <p>500mg • Twice daily</p>
+                                <p class="medication-type">Diabetes Medication</p>
+                            </div>
+                            <div class="medication-status active">
+                                <span>Active</span>
+                            </div>
+                        </div>
+                        <div class="medication-schedule">
+                            <div class="schedule-time">
+                                <span class="time">8:00 AM, 8:00 PM</span>
+                                <span class="next-dose">Next dose in 10 hours</span>
+                            </div>
+                            <div class="medication-actions">
+                                <button class="btn btn-success btn-sm">Mark Taken</button>
+                                <button class="btn btn-outline btn-sm">Skip</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="medication-card">
+                        <div class="medication-header">
+                            <div class="medication-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                                    <rect x="9" y="9" width="6" height="6"></rect>
+                                    <path d="m15 2-3 3-3-3"></path>
+                                </svg>
+                            </div>
+                            <div class="medication-info">
+                                <h4>Vitamin D3</h4>
+                                <p>1000 IU • Once daily</p>
+                                <p class="medication-type">Supplement</p>
+                            </div>
+                            <div class="medication-status active">
+                                <span>Active</span>
+                            </div>
+                        </div>
+                        <div class="medication-schedule">
+                            <div class="schedule-time">
+                                <span class="time">9:00 AM</span>
+                                <span class="next-dose">Next dose in 3 hours</span>
+                            </div>
+                            <div class="medication-actions">
+                                <button class="btn btn-success btn-sm">Mark Taken</button>
+                                <button class="btn btn-outline btn-sm">Skip</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="medications-sidebar">
+                <div class="sidebar-card">
+                    <h4>Today's Progress</h4>
+                    <div class="progress-ring">
+                        <div class="progress-value">75%</div>
+                    </div>
+                    <p>3 of 4 medications taken today</p>
+                </div>
+
+                <div class="sidebar-card">
+                    <h4>Upcoming Refills</h4>
+                    <div class="refill-list">
+                        <div class="refill-item">
+                            <span class="medication-name">Lisinopril</span>
+                            <span class="refill-date">5 days left</span>
+                        </div>
+                        <div class="refill-item">
+                            <span class="medication-name">Metformin</span>
+                            <span class="refill-date">12 days left</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline btn-sm">Order Refills</button>
+                </div>
+
+                <div class="sidebar-card">
+                    <h4>Medication History</h4>
+                    <div class="history-stats">
+                        <div class="stat">
+                            <span class="stat-value">95%</span>
+                            <span class="stat-label">This Month</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-value">92%</span>
+                            <span class="stat-label">Last Month</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline btn-sm">View Full History</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

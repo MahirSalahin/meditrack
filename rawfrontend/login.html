@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - MediTrack</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <!-- Background decorations -->
+        <div class="bg-decoration"></div>
+        <div class="bg-blur blur-1"></div>
+        <div class="bg-blur blur-2"></div>
+        <div class="bg-blur blur-3"></div>
+
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
+                    </svg>
+                </div>
+                <div class="auth-title">
+                    <h1>Welcome Back</h1>
+                    <p>Sign in to your MediTrack account</p>
+                </div>
+            </div>
+
+            <div class="auth-content">
+                <form class="auth-form">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="email" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="password" placeholder="Enter your password" required>
+                            <button type="button" class="password-toggle">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" id="remember">
+                            <span class="checkmark"></span>
+                            Remember me
+                        </label>
+                        <a href="#" class="forgot-link">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+                </form>
+
+                <div class="auth-divider">
+                    <p>Don't have an account? Choose your account type:</p>
+                </div>
+
+                <div class="auth-links">
+                    <a href="doctor-register.html" class="btn btn-outline btn-full">Register as Healthcare Provider</a>
+                    <a href="patient-register.html" class="btn btn-outline btn-full">Register as Patient</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
