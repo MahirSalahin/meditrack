@@ -7,21 +7,28 @@ from app.schemas.profiles import (
     PatientProfileRead,
     DoctorProfileRead,
     DoctorSearchResult,
+    PatientDetailsForDoctor,
+    PatientDetailsForDoctor,
+    PatientListResponse,
 )
 from app.schemas.auth import UserRead
 from app.crud.profiles import (
     get_user_with_profile,
+    toggle_bookmark_patient,
     update_patient_profile,
     update_doctor_profile,
     search_doctors,
     get_doctor_count,
     get_doctor_profile_by_user_id,
+    get_patient_by_patient_id,
+    get_all_patients_for_doctor,
+    search_patients_for_doctor,
+    get_bookmarked_patients,
 )
 from app.crud.auth import update_user, get_user_by_id
 import logging
 import math
 import uuid
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -284,4 +291,230 @@ async def get_doctor_profile(doctor_id: str):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to fetch doctor profile",
+        )
+
+
+@router.get("/patients/{patient_id}", response_model=PatientDetailsForDoctor)
+async def get_patient_details(patient_id: uuid.UUID, request: Request):
+    """Get detailed patient information. Only doctors and admins can access."""
+    try:
+        current_user = request.state.user
+
+        # Check permissions
+        if not (current_user.is_doctor or current_user.is_admin):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only doctors and admins can access patient details",
+            )
+
+        # Get patient details
+        patient = get_patient_by_patient_id(patient_id)
+        if not patient:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
+            )
+
+        return PatientDetailsForDoctor(**patient)
+
+    except Exception as e:
+        logger.error(f"Error fetching patient details: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch patient details",
+        )
+
+
+@router.get("/doctors/patients", response_model=PatientListResponse)
+async def get_doctor_patients(
+    request: Request,
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+):
+    """Get all patients for the current doctor with pagination."""
+    try:
+        current_user = request.state.user
+
+        # Check permissions
+        if not current_user.is_doctor:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only doctors can access patient lists",
+            )
+
+        # Calculate offset
+        offset = (page - 1) * page_size
+
+        # Get patients
+        patients, total_count = get_all_patients_for_doctor(
+            doctor_id=current_user.id,
+            limit=page_size,
+            offset=offset,
+        )
+
+        # Calculate total pages
+        total_pages = math.ceil(total_count / page_size) if total_count > 0 else 0
+
+        # Convert to response format
+        patient_list = []
+        for patient in patients:
+            patient_item = PatientDetailsForDoctor(**patient)
+            patient_list.append(patient_item)
+
+        return PatientListResponse(
+            patients=patient_list,
+            total_count=total_count,
+            page=page,
+            page_size=page_size,
+            total_pages=total_pages,
+        )
+
+    except Exception as e:
+        logger.error(f"Error fetching doctor patients: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch patient list",
+        )
+
+
+@router.get("/doctors/patients/search", response_model=PatientListResponse)
+async def search_doctor_patients(
+    request: Request,
+    search_term: str = Query(
+        ..., description="Search term for patient name, email, or phone"
+    ),
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+):
+    """Search patients for the current doctor with pagination."""
+    try:
+        current_user = request.state.user
+
+        # Check permissions
+        if not current_user.is_doctor:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only doctors can search patients",
+            )
+
+        # Calculate offset
+        offset = (page - 1) * page_size
+
+        # Search patients
+        patients, total_count = search_patients_for_doctor(
+            doctor_id=current_user.id,
+            search_term=search_term,
+            limit=page_size,
+            offset=offset,
+        )
+
+        # Calculate total pages
+        total_pages = math.ceil(total_count / page_size) if total_count > 0 else 0
+
+        # Convert to response format
+        patient_list = []
+        for patient in patients:
+            patient_item = PatientDetailsForDoctor(**patient)
+            patient_list.append(patient_item)
+
+        return PatientListResponse(
+            patients=patient_list,
+            total_count=total_count,
+            page=page,
+            page_size=page_size,
+            total_pages=total_pages,
+        )
+
+    except Exception as e:
+        logger.error(f"Error searching doctor patients: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to search patients",
+        )
+
+
+# Endpoints for doctorbookmark
+@router.get("/bookmark", response_model=PatientListResponse)
+async def bookmarked_patients(
+    request: Request,
+    page: int = Query(1, ge=1, description="Page number"),
+    page_size: int = Query(20, ge=1, le=100, description="Items per page"),
+):
+    """Get all bookmarked patients for the current doctor with pagination."""
+    try:
+        current_user = request.state.user
+        doctor = get_doctor_profile_by_user_id(current_user.id)
+
+        # Check permissions
+        if not doctor:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Doctor Profile is not found!",
+            )
+
+        # Calculate offset
+        offset = (page - 1) * page_size
+
+        # Get bookmarked patients
+        patients, total_count = get_bookmarked_patients(
+            doctor_id=doctor.id,
+            limit=page_size,
+            offset=offset,
+        )
+
+        # Calculate total pages
+        total_pages = math.ceil(total_count / page_size) if total_count > 0 else 0
+
+        # Convert to response format
+        patient_list = []
+        for patient in patients:
+            patient_item = PatientDetailsForDoctor(**patient)
+            patient_list.append(patient_item)
+
+        return PatientListResponse(
+            patients=patient_list,
+            total_count=total_count,
+            page=page,
+            page_size=page_size,
+            total_pages=total_pages,
+        )
+
+    except Exception as e:
+        logger.error(f"Error fetching bookmarked patients: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to fetch bookmarked patients",
+        )
+
+
+@router.post("/bookmark/{patient_id}/toggle")
+async def create_bookmark_patient(patient_id: uuid.UUID, request: Request):
+    """Bookmark a patient for the current doctor."""
+    try:
+        current_user = request.state.user
+
+        # Check permissions
+        if not current_user.is_doctor:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only doctors can bookmark patients",
+            )
+
+        # Bookmark the patient
+        doctor = get_doctor_profile_by_user_id(current_user.id)
+        patient_bookmark = toggle_bookmark_patient(
+            patient_id=patient_id, doctor_id=doctor.id
+        )
+
+        if not patient_bookmark:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found"
+            )
+
+        return patient_bookmark
+
+    except Exception as e:
+        logger.error(f"Error bookmarking patient: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to bookmark patient",
         )

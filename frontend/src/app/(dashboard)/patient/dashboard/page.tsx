@@ -3,15 +3,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Pill, Activity, Plus, Clock, TrendingUp, Heart, Thermometer } from "lucide-react"
+import { Calendar, Pill, Activity, Plus, Clock, Heart, Thermometer } from "lucide-react"
 import {
   useHealthMetrics,
   usePatientAppointments,
   usePatientMedications,
-  usePatientDashboardStats,
 } from "@/lib/api/services/patient/dashboard.service"
 import {
-  StatsCardSkeleton,
   HealthMetricSkeleton,
   AppointmentCardSkeleton,
   MedicationCardSkeleton,
@@ -21,7 +19,6 @@ export default function PatientDashboard() {
   const { data: healthMetrics, isLoading: healthLoading } = useHealthMetrics()
   const { data: appointments, isLoading: appointmentsLoading } = usePatientAppointments()
   const { data: medications, isLoading: medicationsLoading } = usePatientMedications()
-  const { data: stats, isLoading: statsLoading } = usePatientDashboardStats()
 
   const getIcon = (iconName: string) => {
     switch (iconName) {

@@ -14,8 +14,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
             authorize: async (credentials) => {
                 try {
-                    // Send the Google ID token to your backend for verification
-                    const response = await axiosInstance.post("/auth/login", {
+                    const baseURL = ((process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_API_URL : process.env.NEXT_PUBLIC_API_URL_DOCKER) || "http://locahost:8000") + '/api/v1'
+                    const response = await axiosInstance.post(`${baseURL}/auth/login`, {
                         email: credentials.email,
                         password: credentials.password,
                     });

@@ -21,7 +21,7 @@ export const publicRoutes: string[] = [
 * These routes will redirect logged in users to their dashboard
 * @type {string[]}
 */
-export const authRoutes = ['/auth/login', '/auth/doctor', '/auth/patient']
+export const authRoutes = ['/auth', '/auth/login', '/auth/doctor', '/auth/patient']
 
 /*
 * The prefix for the authentication API routes

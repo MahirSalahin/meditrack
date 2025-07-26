@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Medical Prescription</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        @font-face {
+            font-family: 'Noto Color Emoji';
+            src: url(https://raw.githack.com/googlefonts/noto-emoji/main/fonts/NotoColorEmoji.ttf);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #fff;
+            color: #1f2937;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .emoji {
+            font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+        }
+        
+        .prescription-container {
+            width: 100%;
+            min-height: 261mm;
+            margin: 0;
+            background: white;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: visible;
+            box-sizing: border-box;
+            padding: 0;
+        }
+        
+        .header { 
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
+            color: white; 
+            padding: 16px 24px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+        }
+        
+        .doctor-info h1 { 
+            font-size: 18px; 
+            margin-bottom: 2px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+        }
+        
+        .doctor-icon {
+            font-size: 16px;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            text-align: center;
+            line-height: 1;
+            vertical-align: middle;
+        }
+        
+        .doctor-info .credentials { 
+            font-size: 12px; 
+            opacity: 0.9; 
+            margin-bottom: 1px;
+        }
+        
+        .doctor-info .license { 
+            font-size: 11px; 
+            opacity: 0.8;
+        }
+        
+        .clinic-info { 
+            text-align: right; 
+            font-size: 12px;
+        }
+        
+        .clinic-info .clinic-name { 
+            font-size: 14px; 
+            font-weight: 600; 
+            margin-bottom: 2px;
+        }
+        
+        .clinic-info .contact-info { 
+            font-size: 11px; 
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+        
+        .clinic-info .date-issued { 
+            font-size: 12px; 
+            font-weight: 500; 
+            opacity: 0.95;
+        }
+        
+        .content { 
+            padding: 20px 24px;
+        }
+        
+        .patient-section { 
+            background: #f8fafc; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 6px; 
+            padding: 12px 16px; 
+            margin-bottom: 12px;
+        }
+        
+        .patient-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+        
+        .patient-section h2 { 
+            color: #3b82f6; 
+            font-size: 13px; 
+            margin: 0;
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+            font-weight: 600;
+        }
+        
+        .section-icon {
+            font-size: 13px;
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            text-align: center;
+            line-height: 1;
+            vertical-align: middle;
+        }
+        
+        .patient-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+        
+        .patient-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+        
+        .patient-contact {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 13px;
+            color: #64748b;
+        }
+        
+        .diagnosis-section { 
+            background: #fef3c7; 
+            border: 1px solid #fbbf24; 
+            border-radius: 6px; 
+            padding: 8px 12px; 
+            margin-bottom: 12px;
+        }
+        
+        .diagnosis-section h2 { 
+            color: #92400e; 
+            font-size: 13px; 
+            margin-bottom: 4px; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+            font-weight: 600;
+        }
+        
+        .diagnosis-section .section-icon {
+            font-size: 13px;
+            width: 15px;
+            height: 15px;
+        }
+        
+        .diagnosis-text { 
+            font-size: 13px; 
+            font-weight: 500; 
+            color: #92400e;
+        }
+        
+        .medications-section h2 { 
+            color: #3b82f6; 
+            font-size: 16px; 
+            margin-bottom: 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            font-weight: 600;
+        }
+        
+        .medications-section .section-icon {
+            font-size: 14px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .medications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .medication-item {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 10px 12px;
+        }
+        
+        .medication-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+        
+        .medication-number {
+            font-weight: 600;
+            color: #2563eb;
+            font-size: 14px;
+        }
+        
+        .medication-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+        }
+        
+        .medication-dosage {
+            font-weight: 500;
+            color: #0e7490;
+            font-size: 14px;
+        }
+        
+        .medication-details {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+        
+        .instructions-section { 
+            background: #ecfdf5; 
+            border: 1px solid #10b981; 
+            border-radius: 6px; 
+            padding: 12px; 
+            margin-top: 16px;
+        }
+        
+        .instructions-section h3 { 
+            color: #047857; 
+            font-size: 12px; 
+            margin-bottom: 6px; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+            font-weight: 600;
+        }
+        
+        .instructions-list { 
+            list-style: none; 
+            padding: 0;
+        }
+        
+        .instructions-list li { 
+            padding: 3px 0; 
+            color: #065f46; 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 6px;
+            font-size: 12px;
+        }
+        
+        .instructions-list li::before { 
+            content: "✓"; 
+            color: #10b981; 
+            font-weight: bold; 
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        
+        .notes-section { 
+            background: #fef7ff; 
+            border: 1px solid #a855f7; 
+            border-radius: 6px; 
+            padding: 12px;
+            margin-top: 12px;
+        }
+        
+        .notes-section h3 { 
+            color: #7c3aed; 
+            font-size: 12px; 
+            margin-bottom: 6px; 
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+            font-weight: 600;
+        }
+        
+        .notes-text { 
+            color: #581c87; 
+            font-size: 12px; 
+            line-height: 1.5;
+        }
+        
+        .footer { 
+            text-align: center; 
+            padding: 12px; 
+            color: #6b7280; 
+            font-size: 11px; 
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        @media print {
+            body { background: white; padding: 0; }
+            .prescription-container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="prescription-container">
+        <div class="header">
+            <div class="doctor-info">
+                <h1>
+                    <span class="doctor-icon emoji">👨‍⚕️</span>
+                    Dr. {{ doctor.name }}
+                </h1>
+                <div class="credentials">{{ doctor.specialization }}</div>
+                <div class="license">
+                    {% if doctor.medical_license_number %}
+                    Reg: {{ doctor.medical_license_number }}
+                    {% endif %}
+                </div>
+                <div class="contact-info" style="font-size:11px; color:#e0e7ef; margin-top:2px;">
+                    {{ doctor.email }} | {{ doctor.phone }}
+                </div>
+            </div>
+            <div class="clinic-info">
+                <div class="clinic-name">MEDITRACK</div>
+                <div class="contact-info">Digital Health Platform</div>
+                <div class="date-issued">{{ start_date }}</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="patient-section">
+                <div class="patient-header">
+                    <h2>
+                        <span class="section-icon emoji">👤</span>
+                        Patient
+                    </h2>
+                    <div class="patient-name">{{ patient.name }}</div>
+                </div>
+                <div class="patient-details">
+                    <span>Age: {{ patient.age }}Y</span>
+                    <span>Address: {{ patient.address }}</span>
+                </div>
+                <div class="patient-contact">
+                    <span>Email: {{ patient.email }}</span>
+                    <span>Phone: {{ patient.phone }}</span>
+                </div>
+            </div>
+            
+            <div class="diagnosis-section">
+                <h2>
+                    <span class="section-icon emoji">🩺</span>
+                    Diagnosis
+                </h2>
+                <div class="diagnosis-text">{{ diagnosis or 'General consultation' }}</div>
+            </div>
+            
+            <div class="medications-section">
+                <h2>
+                    <span class="section-icon emoji">💊</span>
+                    Prescription
+                </h2>
+                <div class="medications-list">
+                {% for item in items %}
+                    <div class="medication-item">
+                        <div class="medication-header">
+                            <span class="medication-number">{{ loop.index }}.</span>
+                            <span class="medication-name">{{ item.medication_name or ("Medicine #" ~ loop.index) }}</span>
+                            <span class="medication-dosage">{{ item.dosage }}</span>
+                        </div>
+                        <div class="medication-details">
+                            Frequency: {{ item.frequency }} | Quantity: {{ item.quantity }}{% if item.duration %} | Duration: {{ item.duration }}{% endif %}{% if item.instructions %} | {{ item.instructions }}{% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+            
+            <div class="instructions-section">
+                <h3>
+                    <span class="section-icon emoji">💡</span>
+                    Important Guidelines
+                </h3>
+                <ul class="instructions-list">
+                    <li>Take your medications exactly as prescribed by your doctor</li>
+                    <li>Complete the full course of treatment even if you feel better</li>
+                    <li>Store medicines in a cool, dry place away from direct sunlight</li>
+                    <li>Keep medications out of reach of children</li>
+                    <li>Contact your doctor immediately if you experience any side effects</li>
+                    <li>Don't share your medications with others</li>
+                    <li>Follow up with your doctor as scheduled</li>
+                </ul>
+            </div>
+            
+            {% if notes %}
+            <div class="notes-section">
+                <h3>
+                    <span class="section-icon emoji">📝</span>
+                    Additional Notes
+                </h3>
+                <div class="notes-text">{{ notes }}</div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            This prescription is valid for 30 days from the date of issue. Please contact the clinic if you have any questions.
+        </div>
+    </div>
+</body>
+</html>

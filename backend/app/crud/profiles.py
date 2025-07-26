@@ -1,19 +1,117 @@
+from fastapi import HTTPException, status
 from sqlmodel import Session, select
 from sqlalchemy.exc import IntegrityError
-from app.models.profiles import PatientProfile, DoctorProfile
+from app.models.profiles import DoctorBookmark, PatientProfile, DoctorProfile
 from app.schemas.profiles import (
     PatientProfileCreate,
     PatientProfileUpdate,
     DoctorProfileCreate,
     DoctorProfileUpdate,
 )
+from app.models.auth import User
 from app.db.session import engine
-from typing import Optional
+from typing import Optional, Tuple, List
 from datetime import datetime
 import logging
 import uuid
+from sqlalchemy import func, or_
+from app.crud.auth import get_user_by_id
+from datetime import date
 
 logger = logging.getLogger(__name__)
+
+
+async def get_profile(
+    user_id: Optional[uuid.UUID] = None,
+    profile_id: Optional[uuid.UUID] = None,
+    password: bool = False,
+) -> dict:
+    if not (user_id or profile_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Either user_id or profile_id must be provided",
+        )
+
+    user = None
+    profile = None
+
+    if user_id:
+        user = get_user_by_id(user_id)
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found for the given user ID",
+            )
+        profile = get_patient_profile_by_user_id(
+            user_id
+        ) or get_doctor_profile_by_user_id(user_id)
+    elif profile_id:
+        with Session(engine) as session:
+            profile = (
+                session.exec(
+                    select(PatientProfile).where(PatientProfile.id == profile_id)
+                ).first()
+                or session.exec(
+                    select(DoctorProfile).where(DoctorProfile.id == profile_id)
+                ).first()
+            )
+            if not profile:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Profile not found for the given profile ID",
+                )
+            user = get_user_by_id(profile.user_id)
+
+    result = {}
+    if user:
+        for k, v in user.__dict__.items():
+            if k == "password_hash" and not password:
+                continue
+            if not k.startswith("_"):
+                result[k] = v
+    if profile:
+        for k, v in profile.__dict__.items():
+            if not k.startswith("_"):
+                if k == "id":
+                    result["profile_id"] = v
+                elif k != "user_id":
+                    result[k] = v
+
+    if "date_of_birth" in result and result["date_of_birth"]:
+        dob = result["date_of_birth"]
+        if isinstance(dob, str):
+            dob = date.fromisoformat(dob)
+        today = date.today()
+        result["age"] = (
+            today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        )
+
+    return result
+
+
+# Helper function to get user profile ID
+async def get_user_profile_id(user: User) -> uuid.UUID:
+    """Get the profile ID for the current user based on their type."""
+    if user.is_patient:
+        profile = get_patient_profile_by_user_id(user.id)
+        if not profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Patient profile not found",
+            )
+        return profile.id
+    elif user.is_doctor:
+        profile = get_doctor_profile_by_user_id(user.id)
+        if not profile:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Doctor profile not found"
+            )
+        return profile.id
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only patients and doctors can access medications",
+        )
 
 
 # Patient Profile CRUD
@@ -312,3 +410,423 @@ def get_user_with_profile(user_id: uuid.UUID) -> Optional[dict]:
     except Exception as e:
         logger.error(f"Error fetching user with profile: {e}")
         return None
+
+
+def get_all_patients_for_doctor(
+    doctor_id: uuid.UUID, limit: int = 50, offset: int = 0
+) -> Tuple[List[dict], int]:
+    """Get all patients that a doctor has seen (through appointments)."""
+    try:
+        with Session(engine) as session:
+            from app.models.auth import User
+            from app.models.appointments import Appointment
+
+            # Get patients through appointments
+            base_query = (
+                select(
+                    PatientProfile,
+                    User.first_name,
+                    User.last_name,
+                    User.email,
+                    User.phone,
+                    func.count(Appointment.id).label("appointment_count"),
+                    func.max(Appointment.appointment_date).label("last_visit"),
+                )
+                .join(User, PatientProfile.user_id == User.id)
+                .join(Appointment, PatientProfile.id == Appointment.patient_id)
+                .where(Appointment.doctor_id == doctor_id)
+                .group_by(
+                    PatientProfile.id,
+                    User.first_name,
+                    User.last_name,
+                    User.email,
+                    User.phone,
+                )
+            )
+
+            # Get total count
+            count_query = select(func.count()).select_from(base_query.subquery())
+            total_count = session.exec(count_query).first()
+
+            # Apply pagination
+            patients_query = (
+                base_query.offset(offset)
+                .limit(limit)
+                .order_by(func.max(Appointment.appointment_date).desc())
+            )
+
+            results = session.exec(patients_query).all()
+
+            # Format results
+            patients = []
+            for result in results:
+                (
+                    patient_profile,
+                    first_name,
+                    last_name,
+                    email,
+                    phone,
+                    appointment_count,
+                    last_visit,
+                ) = result
+
+                # Calculate age
+                age = None
+                if patient_profile.date_of_birth:
+                    from datetime import date
+
+                    today = date.today()
+                    age = (
+                        today.year
+                        - patient_profile.date_of_birth.year
+                        - (
+                            (today.month, today.day)
+                            < (
+                                patient_profile.date_of_birth.month,
+                                patient_profile.date_of_birth.day,
+                            )
+                        )
+                    )
+
+                patient_dict = {
+                    "id": str(patient_profile.id),
+                    "name": f"{first_name} {last_name}",
+                    "email": email,
+                    "phone": phone,
+                    "age": age,
+                    "gender": patient_profile.gender,
+                    "blood_group": patient_profile.blood_group,
+                    "appointment_count": appointment_count,
+                    "last_visit": last_visit.isoformat() if last_visit else None,
+                    "allergies": patient_profile.allergies or [],
+                    "medical_history": patient_profile.medical_history or "",
+                    "emergency_contact_name": patient_profile.emergency_contact_name,
+                    "emergency_contact_phone": patient_profile.emergency_contact_phone,
+                    "address": patient_profile.address,
+                    "insurance_info": patient_profile.insurance_info,
+                }
+                patients.append(patient_dict)
+
+            return patients, total_count
+
+    except Exception as e:
+        logger.error(f"Error fetching patients for doctor {doctor_id}: {e}")
+        return [], 0
+
+
+def get_patient_by_patient_id(patient_id: uuid.UUID) -> Optional[dict]:
+    """Get patient profile with user information."""
+    try:
+        with Session(engine) as session:
+            statement = (
+                select(PatientProfile, User)
+                .join(PatientProfile, User.id == PatientProfile.user_id)
+                .where(PatientProfile.id == patient_id)
+            )
+
+            result = session.exec(statement).first()
+            if not result:
+                return None
+
+            patient_profile, user = result
+
+            # Calculate age
+            age = None
+            if patient_profile.date_of_birth:
+                from datetime import date
+
+                today = date.today()
+                age = (
+                    today.year
+                    - patient_profile.date_of_birth.year
+                    - (
+                        (today.month, today.day)
+                        < (
+                            patient_profile.date_of_birth.month,
+                            patient_profile.date_of_birth.day,
+                        )
+                    )
+                )
+
+            patinet_bookmark = session.exec(
+                select(DoctorBookmark).where(DoctorBookmark.patient_id == patient_id)
+            ).first()
+            if patinet_bookmark:
+                is_bookmarked = True
+            else:
+                is_bookmarked = False
+
+            return {
+                "id": str(patient_id),
+                "name": f"{user.first_name} {user.last_name}",
+                "email": user.email,
+                "phone": user.phone,
+                "age": age,
+                "gender": patient_profile.gender,
+                "blood_group": patient_profile.blood_group,
+                "allergies": patient_profile.allergies or [],
+                "medical_history": patient_profile.medical_history or "",
+                "emergency_contact_name": patient_profile.emergency_contact_name,
+                "emergency_contact_phone": patient_profile.emergency_contact_phone,
+                "address": patient_profile.address,
+                "insurance_info": patient_profile.insurance_info,
+                "is_bookmarked": is_bookmarked,
+                "date_of_birth": patient_profile.date_of_birth.isoformat()
+                if patient_profile.date_of_birth
+                else None,
+            }
+
+    except Exception as e:
+        logger.error(f"Error fetching patient {patient_id}: {e}")
+        return None
+
+
+def search_patients_for_doctor(
+    doctor_id: uuid.UUID,
+    search_term: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0,
+) -> Tuple[List[dict], int]:
+    """Search patients for a doctor with optional search term."""
+    try:
+        with Session(engine) as session:
+            from app.models.auth import User
+            from app.models.appointments import Appointment
+
+            # Base query
+            base_query = (
+                select(
+                    PatientProfile,
+                    User.first_name,
+                    User.last_name,
+                    User.email,
+                    User.phone,
+                    func.count(Appointment.id).label("appointment_count"),
+                    func.max(Appointment.appointment_date).label("last_visit"),
+                )
+                .join(User, PatientProfile.user_id == User.id)
+                .join(Appointment, PatientProfile.id == Appointment.patient_id)
+                .where(Appointment.doctor_id == doctor_id)
+            )
+
+            # Add search filter if provided
+            if search_term:
+                base_query = base_query.where(
+                    or_(
+                        User.first_name.ilike(f"%{search_term}%"),
+                        User.last_name.ilike(f"%{search_term}%"),
+                        User.email.ilike(f"%{search_term}%"),
+                        User.phone.ilike(f"%{search_term}%"),
+                    )
+                )
+
+            base_query = base_query.group_by(
+                PatientProfile.id,
+                User.first_name,
+                User.last_name,
+                User.email,
+                User.phone,
+            )
+
+            # Get total count
+            count_query = select(func.count()).select_from(base_query.subquery())
+            total_count = session.exec(count_query).first()
+
+            # Apply pagination and get results
+            patients_query = (
+                base_query.offset(offset)
+                .limit(limit)
+                .order_by(func.max(Appointment.appointment_date).desc())
+            )
+
+            results = session.exec(patients_query).all()
+
+            # Format results
+            patients = []
+            for result in results:
+                (
+                    patient_profile,
+                    first_name,
+                    last_name,
+                    email,
+                    phone,
+                    appointment_count,
+                    last_visit,
+                ) = result
+
+                # Calculate age
+                age = None
+                if patient_profile.date_of_birth:
+                    from datetime import date
+
+                    today = date.today()
+                    age = (
+                        today.year
+                        - patient_profile.date_of_birth.year
+                        - (
+                            (today.month, today.day)
+                            < (
+                                patient_profile.date_of_birth.month,
+                                patient_profile.date_of_birth.day,
+                            )
+                        )
+                    )
+
+                patient_dict = {
+                    "id": str(patient_profile.id),
+                    "name": f"{first_name} {last_name}",
+                    "email": email,
+                    "phone": phone,
+                    "age": age,
+                    "gender": patient_profile.gender,
+                    "blood_group": patient_profile.blood_group,
+                    "appointment_count": appointment_count,
+                    "last_visit": last_visit.isoformat() if last_visit else None,
+                    "allergies": patient_profile.allergies or [],
+                    "medical_history": patient_profile.medical_history or "",
+                    "emergency_contact_name": patient_profile.emergency_contact_name,
+                    "emergency_contact_phone": patient_profile.emergency_contact_phone,
+                    "address": patient_profile.address,
+                    "insurance_info": patient_profile.insurance_info,
+                }
+                patients.append(patient_dict)
+
+            return patients, total_count
+
+    except Exception as e:
+        logger.error(f"Error searching patients for doctor {doctor_id}: {e}")
+        return [], 0
+
+
+def toggle_bookmark_patient(
+    doctor_id: uuid.UUID, patient_id: uuid.UUID
+) -> Optional[PatientProfile]:
+    """Bookmark a patient for a doctor."""
+    try:
+        with Session(engine) as session:
+            # Check if bookmark already exists
+            existing_bookmark = session.exec(
+                select(DoctorBookmark).where(
+                    DoctorBookmark.doctor_id == doctor_id,
+                    DoctorBookmark.patient_id == patient_id,
+                )
+            ).first()
+
+            if existing_bookmark:
+                # If exists, remove (unbookmark)
+                session.delete(existing_bookmark)
+                session.commit()
+                # Return the patient profile (now unbookmarked)
+                return True
+            else:
+                # Create new bookmark
+                bookmark = DoctorBookmark(doctor_id=doctor_id, patient_id=patient_id)
+                logger.info(f"✅ Creating bookmark: {bookmark}")
+                session.add(bookmark)
+                session.commit()
+                session.refresh(bookmark)
+                # Return the patient profile (now bookmarked)
+                return True
+
+    except Exception as e:
+        logger.error(
+            f"Error bookmarking patient {patient_id} for doctor {doctor_id}: {e}"
+        )
+        return None
+
+
+def get_bookmarked_patients(
+    doctor_id: uuid.UUID, limit: int = 50, offset: int = 0
+) -> Tuple[List[dict], int]:
+    """Get all bookmarked patients that a doctor has made."""
+    try:
+        with Session(engine) as session:
+            # Join DoctorBookmark to PatientProfile and User
+            base_query = (
+                select(
+                    PatientProfile,
+                    User.first_name,
+                    User.last_name,
+                    User.email,
+                    User.phone,
+                    func.count(DoctorBookmark.id).label("bookmark_count"),
+                )
+                .join(DoctorBookmark, DoctorBookmark.patient_id == PatientProfile.id)
+                .join(User, PatientProfile.user_id == User.id)
+                .where(DoctorBookmark.doctor_id == doctor_id)
+                .group_by(
+                    PatientProfile.id,
+                    User.first_name,
+                    User.last_name,
+                    User.email,
+                    User.phone,
+                )
+            )
+
+            # Get total count
+            count_query = select(func.count()).select_from(base_query.subquery())
+            total_count = session.exec(count_query).first()
+
+            # Apply pagination
+            patients_query = (
+                base_query.offset(offset).limit(limit)
+                # .order_by(func.max(DoctorBookmark.created_at).desc())  # Only if you want to order by latest bookmark
+            )
+
+            results = session.exec(patients_query).all()
+
+            # Format results
+            patients = []
+            for result in results:
+                (
+                    patient_profile,
+                    first_name,
+                    last_name,
+                    email,
+                    phone,
+                    bookmark_count,
+                ) = result
+
+                # Calculate age
+                age = None
+                if patient_profile.date_of_birth:
+                    from datetime import date
+
+                    today = date.today()
+                    age = (
+                        today.year
+                        - patient_profile.date_of_birth.year
+                        - (
+                            (today.month, today.day)
+                            < (
+                                patient_profile.date_of_birth.month,
+                                patient_profile.date_of_birth.day,
+                            )
+                        )
+                    )
+
+                patient_dict = {
+                    "id": str(patient_profile.id),
+                    "name": f"{first_name} {last_name}",
+                    "email": email,
+                    "phone": phone,
+                    "age": age,
+                    "gender": patient_profile.gender,
+                    "blood_group": patient_profile.blood_group,
+                    "appointment_count": bookmark_count,
+                    # "last_visit": last_visit.isoformat() if last_visit else None,  # Remove if not selected
+                    "allergies": patient_profile.allergies or [],
+                    "medical_history": patient_profile.medical_history or "",
+                    "emergency_contact_name": patient_profile.emergency_contact_name,
+                    "emergency_contact_phone": patient_profile.emergency_contact_phone,
+                    "address": patient_profile.address,
+                    "insurance_info": patient_profile.insurance_info,
+                    "is_bookmarked": True,
+                }
+                patients.append(patient_dict)
+
+            return patients, total_count
+
+    except Exception as e:
+        logger.error(f"Error fetching patients for doctor {doctor_id}: {e}")
+        return [], 0

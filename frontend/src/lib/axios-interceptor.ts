@@ -9,7 +9,12 @@ interface ApiErrorResponse {
 }
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1"
+  baseURL: ((
+    process.env.NODE_ENV === "development" ?
+      process.env.NEXT_PUBLIC_API_URL :
+      process.env.NEXT_PUBLIC_API_URL_DOCKER
+  ) || "http://localhost:8000"
+  ) + '/api/v1'
 });
 
 // Add a request interceptor to set the Authorization header dynamically

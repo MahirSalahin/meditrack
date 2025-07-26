@@ -25,6 +25,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             "/api/v1/auth/register/doctor",
             "/api/v1/profiles/doctors/search",
             "/",
+            "/uploads/abd50c5c-7939-4465-92ea-3c00ce41dd6d.pdf",
         ]
 
     async def dispatch(self, request: Request, call_next):
@@ -37,8 +38,11 @@ class AuthMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         # Skip auth for static files and OPTIONS requests
-        if (request.url.path.startswith("/static") or
-                request.method == "OPTIONS"):
+        if (
+            request.url.path.startswith("/static") or
+            request.url.path.startswith("/files") or
+            request.method == "OPTIONS"
+        ):
             return await call_next(request)
 
         # Extract token from Authorization header

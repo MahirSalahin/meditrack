@@ -38,8 +38,29 @@ from .appointments import (
     AppointmentBatchUpdate
 )
 
+from .medications import (
+    # Medication schemas
+    MedicationCreate,
+    MedicationUpdate,
+    MedicationRead,
+    MedicationSearchFilters,
+    # Prescription schemas
+    PrescriptionCreate,
+    PrescriptionUpdate,
+    PrescriptionRead,
+    PrescriptionWithDetails,
+    PrescriptionSearchFilters,
+    PrescriptionStats,
+    PrescriptionBatchUpdate,
+    # Medication log schemas
+    MedicationLogCreate,
+    MedicationLogUpdate,
+    MedicationLogRead,
+    MedicationLogWithDetails
+)
+
 # Import enums from models
-from app.models.enums import UserType, BloodGroup, Gender, AppointmentStatus, AppointmentType
+from app.models.enums import UserType, BloodGroup, Gender, AppointmentStatus, AppointmentType, MedicationStatus, PrescriptionStatus
 
 __all__ = [
     # Base schemas
@@ -70,6 +91,23 @@ __all__ = [
     "AppointmentReminderRead",
     "AppointmentBatchUpdate",
     
+    # Medication schemas
+    "MedicationCreate",
+    "MedicationUpdate",
+    "MedicationRead",
+    "MedicationSearchFilters",
+    "PrescriptionCreate",
+    "PrescriptionUpdate",
+    "PrescriptionRead",
+    "PrescriptionWithDetails",
+    "PrescriptionSearchFilters",
+    "PrescriptionStats",
+    "PrescriptionBatchUpdate",
+    "MedicationLogCreate",
+    "MedicationLogUpdate",
+    "MedicationLogRead",
+    "MedicationLogWithDetails",
+    
     # Auth schemas
     "Token",
     "TokenData",
@@ -83,5 +121,7 @@ __all__ = [
     "BloodGroup",
     "Gender",
     "AppointmentStatus",
-    "AppointmentType"
+    "AppointmentType",
+    "MedicationStatus",
+    "PrescriptionStatus"
 ]
