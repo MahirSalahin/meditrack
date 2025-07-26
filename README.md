@@ -215,18 +215,12 @@ cd meditrack
    BACKEND_CORS_ORIGINS=http://localhost:3000
    ```
 
-6. **Add GCP Service Account File** (Optional):
-   - Download your Google Cloud service account JSON file from GCP Console
-   - Place it in the backend folder and rename it to match your configuration
-   - The file should be referenced in your environment variables or code
-   - **Important**: Never commit this file to version control (add to .gitignore)
-
-7. **Run database migrations**:
+6. **Run database migrations**:
    ```bash
    alembic upgrade head
    ```
 
-8. **Start the backend server**:
+7. **Start the backend server**:
    ```bash
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
