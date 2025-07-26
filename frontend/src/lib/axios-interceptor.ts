@@ -10,9 +10,7 @@ interface ApiErrorResponse {
 
 const axiosInstance = axios.create({
   baseURL: ((
-    process.env.NODE_ENV === "development" ?
-      process.env.NEXT_PUBLIC_API_URL :
-      process.env.NEXT_PUBLIC_API_URL_DOCKER
+    process.env.NEXT_PUBLIC_API_URL
   ) || "http://localhost:8000"
   ) + '/api/v1'
 });
