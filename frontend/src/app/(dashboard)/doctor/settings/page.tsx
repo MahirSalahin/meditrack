@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Separator } from "@/components/ui/separator"
 import TitleHeader from "@/components/title-header"
-import { Bell, Shield, User, Lock, Calendar, MessageSquare } from "lucide-react"
+import { Bell, Shield, Lock, Calendar, MessageSquare } from "lucide-react"
 
 export default function DoctorSettingsPage() {
     return (
@@ -18,37 +18,6 @@ export default function DoctorSettingsPage() {
             />
 
             <div className="grid gap-6">
-                {/* Profile Settings */}
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center space-x-2">
-                            <User className="h-5 w-5" />
-                            <span>Profile Settings</span>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                                <Label htmlFor="firstName">First Name</Label>
-                                <Input id="firstName" defaultValue="Sarah" />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="lastName">Last Name</Label>
-                                <Input id="lastName" defaultValue="Johnson" />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input id="email" type="email" defaultValue="sarah.johnson@meditrack.com" />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="phone">Phone Number</Label>
-                                <Input id="phone" type="tel" defaultValue="+1 (555) 123-4567" />
-                            </div>
-                        </div>
-                        <Button>Save Changes</Button>
-                    </CardContent>
-                </Card>
-
                 {/* Notification Preferences */}
                 <Card>
                     <CardHeader>

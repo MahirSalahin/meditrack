@@ -4,8 +4,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Users, Plus, TrendingUp, Stethoscope, ArrowUpRight } from "lucide-react"
+import { useProfile } from "@/lib/api/profile.service"
+import { useAppointmentStats } from "@/lib/api/appointment.service"
 
 export default function DoctorDashboard() {
+  const { data: profile } = useProfile()
+  const { data: appointmentStats } = useAppointmentStats()
+  
+  const doctorName = profile?.user?.full_name || profile?.user?.first_name || "Doctor"
+  const appointmentsToday = appointmentStats?.today_count || 0
+
   const todayAppointments = [
     { id: 1, patient: "John Doe", time: "9:00 AM", type: "Follow-up", status: "confirmed" },
     { id: 2, patient: "Sarah Wilson", time: "10:30 AM", type: "Consultation", status: "pending" },
@@ -23,9 +31,9 @@ export default function DoctorDashboard() {
       <div className={`bg-primary text-primary-foreground rounded-2xl p-8 relative overflow-hidden`}>
         <div className="relative z-10">
           <h1 className="text-3xl font-bold mb-2">Good morning 👋</h1>
-          <h2 className="text-2xl font-semibold mb-4">Dr. Smith</h2>
+          <h2 className="text-2xl font-semibold mb-4">{doctorName}</h2>
           <p className="text-lg mb-6 max-w-md">
-            You have 8 appointments scheduled for today. Ready to help your patients!
+            You have {appointmentsToday} appointments scheduled for today. Ready to help your patients!
           </p>
           <Button variant="outline" className="bg-secondary text-secondary-foreground">View Schedule</Button>
         </div>
@@ -45,10 +53,10 @@ export default function DoctorDashboard() {
               <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold">8</div>
+              <div className="text-3xl font-bold">{appointmentStats?.today_count || 0}</div>
               <div className="flex items-center text-sm">
                 <TrendingUp className="h-3 w-3 text-blue-500 mr-1" />
-                <span className="text-blue-500">3 pending</span>
+                <span className="text-blue-500">{appointmentStats?.scheduled || 0} pending</span>
               </div>
             </div>
           </CardContent>
@@ -57,14 +65,14 @@ export default function DoctorDashboard() {
         <Card className="shadow-sm border-0">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Total Patients</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">Total Appointments</h3>
               <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold">247</div>
+              <div className="text-3xl font-bold">{appointmentStats?.total_appointments || 0}</div>
               <div className="flex items-center text-sm">
                 <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-                <span className="text-green-500">+12 this month</span>
+                <span className="text-green-500">{appointmentStats?.upcoming_count || 0} upcoming</span>
               </div>
             </div>
           </CardContent>
@@ -73,13 +81,13 @@ export default function DoctorDashboard() {
         <Card className="shadow-sm border-0">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-muted-foreground">Pending Reviews</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">Completed</h3>
               <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold">15</div>
+              <div className="text-3xl font-bold">{appointmentStats?.completed || 0}</div>
               <div className="flex items-center text-sm">
-                <span className="text-purple-500">Lab results</span>
+                <span className="text-purple-500">This month</span>
               </div>
             </div>
           </CardContent>

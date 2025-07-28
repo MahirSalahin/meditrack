@@ -1,4 +1,4 @@
-import { wait } from "@/lib/wait"
+import axiosInstance from "@/lib/axios-interceptor"
 import { useQuery } from "@tanstack/react-query"
 
 export interface Education {
@@ -33,66 +33,78 @@ export interface DoctorProfile {
     workingHours: WorkingHours[]
 }
 
-const getDoctorProfileData = async (): Promise<DoctorProfile> => {
-    await wait(800)
-    return {
-        name: "Dr. Sarah Johnson",
-        specialization: "Cardiologist",
-        email: "sarah.johnson@meditrack.com",
-        phone: "+1 (555) 123-4567",
-        location: "New York, NY",
-        licenseNumber: "MD123456",
-        yearsOfExperience: 15,
-        hospitalAffiliation: "New York Medical Center",
-        department: "Cardiology",
-        education: [
-            {
-                degree: "MD - Doctor of Medicine",
-                institution: "Harvard Medical School",
-                year: "2005-2009"
-            },
-            {
-                degree: "Residency in Internal Medicine",
-                institution: "Massachusetts General Hospital",
-                year: "2009-2012"
-            },
-            {
-                degree: "Fellowship in Cardiology",
-                institution: "Johns Hopkins Hospital",
-                year: "2012-2015"
+const getDoctorProfileData = async (): Promise<DoctorProfile | null> => {
+    try {
+        const response = await axiosInstance.get("/profiles/me")
+        const userData = response.data
+
+        if (!userData.user.is_doctor || !userData.doctor_profile) {
+            return null
+        }
+
+        const user = userData.user
+        const profile = userData.doctor_profile
+
+        // Parse available_days JSON if it exists
+        let workingHours: WorkingHours[] = []
+        try {
+            if (profile.available_days) {
+                const parsed = JSON.parse(profile.available_days)
+                workingHours = Array.isArray(parsed) ? parsed : []
             }
-        ],
-        certifications: [
-            {
-                name: "Board Certification in Internal Medicine",
-                issuer: "American Board of Internal Medicine",
-                year: "2012"
-            },
-            {
-                name: "Board Certification in Cardiovascular Disease",
-                issuer: "American Board of Internal Medicine",
-                year: "2015"
-            },
-            {
-                name: "Advanced Cardiac Life Support (ACLS)",
-                issuer: "American Heart Association",
-                year: "2023"
+        } catch {
+            // Fallback to default working hours
+            workingHours = [
+                { days: "Monday - Friday", time: "9:00 AM - 5:00 PM" },
+                { days: "Saturday", time: "10:00 AM - 2:00 PM" },
+                { days: "Sunday", time: "Emergency Only" }
+            ]
+        }
+
+        // Parse education from education_background if it exists
+        let education: Education[] = []
+        try {
+            if (profile.education_background) {
+                const parsed = JSON.parse(profile.education_background)
+                education = Array.isArray(parsed) ? parsed : []
             }
-        ],
-        workingHours: [
+        } catch {
+            // Fallback if education_background is not JSON
+            if (profile.education_background) {
+                education = [{
+                    degree: profile.education_background,
+                    institution: "Medical Institution",
+                    year: "N/A"
+                }]
+            }
+        }
+
+        // Default certifications (since we don't have a certifications field in the backend)
+        const certifications: Certification[] = [
             {
-                days: "Monday - Friday",
-                time: "9:00 AM - 5:00 PM"
-            },
-            {
-                days: "Saturday",
-                time: "10:00 AM - 2:00 PM"
-            },
-            {
-                days: "Sunday",
-                time: "Emergency Only"
+                name: `Board Certification in ${profile.specialization}`,
+                issuer: "Medical Board",
+                year: "Current"
             }
         ]
+
+        return {
+            name: user.full_name || `${user.first_name} ${user.last_name}`.trim(),
+            specialization: profile.specialization,
+            email: user.email,
+            phone: user.phone || "Not provided",
+            location: "Location not set", // Backend doesn't have location field
+            licenseNumber: profile.medical_license_number,
+            yearsOfExperience: profile.years_of_experience || 0,
+            hospitalAffiliation: profile.hospital_affiliation || "Not specified",
+            department: profile.specialization, // Using specialization as department
+            education,
+            certifications,
+            workingHours
+        }
+    } catch (error) {
+        console.error("Error fetching doctor profile:", error)
+        return null
     }
 }
 

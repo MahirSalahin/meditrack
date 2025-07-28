@@ -1,40 +1,61 @@
-import { wait } from "@/lib/wait"
+import axiosInstance from "@/lib/axios-interceptor"
 import { PatientProfile } from "./types"
 import { useQuery } from "@tanstack/react-query"
 
-// Static data functions
+// API function to get profile data
 const getProfileData = async (): Promise<PatientProfile> => {
-    await wait(500)
-    return {
-        id: "PAT-001234",
-        firstName: "John",
-        lastName: "Doe",
-        email: "john.doe@email.com",
-        phone: "(555) 123-4567",
-        dateOfBirth: "1985-06-15",
-        gender: "Male",
-        address: "123 Main Street, Apt 4B, New York, NY 10001",
-        bloodType: "O+",
-        height: "5'10\"",
-        weight: "175 lbs",
-        memberSince: "January 2024",
-        emergencyContacts: [
-            { id: 1, name: "Jane Doe", relationship: "Spouse", phone: "(555) 123-4567" },
-            { id: 2, name: "Robert Doe", relationship: "Son", phone: "(555) 234-5678" },
-        ],
-        allergies: [
-            { id: 1, allergen: "Penicillin", severity: "Severe", reaction: "Anaphylaxis" },
-            { id: 2, allergen: "Shellfish", severity: "Moderate", reaction: "Hives, swelling" },
-        ],
-        medicalConditions: [
-            { id: 1, condition: "Hypertension", diagnosedDate: "2020-03-15", status: "Active" },
-            { id: 2, condition: "Type 2 Diabetes", diagnosedDate: "2019-08-22", status: "Active" },
-        ],
-        insurance: {
-            provider: "Blue Cross Blue Shield",
-            policyNumber: "BC123456789",
-            groupNumber: "GRP001234",
-            memberId: "MEM987654321"
+    try {
+        const response = await axiosInstance.get("/profiles/me")
+        const profile = response.data
+        
+        return {
+            id: profile.id,
+            firstName: profile.first_name || "Unknown",
+            lastName: profile.last_name || "User",
+            email: profile.email || "No email provided",
+            phone: profile.phone || "No phone provided",
+            dateOfBirth: profile.date_of_birth || "Not provided",
+            gender: profile.gender || "Not specified",
+            address: profile.address || "No address provided",
+            bloodType: profile.blood_type || "Unknown",
+            height: `${profile.height || "Unknown"} cm`,
+            weight: `${profile.weight || "Unknown"} kg`, 
+            memberSince: profile.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : "Unknown",
+            emergencyContacts: profile.emergency_contacts || [],
+            allergies: profile.allergies || [],
+            medicalConditions: profile.medical_conditions || [],
+            insurance: {
+                provider: profile.insurance_provider || "No insurance provided",
+                policyNumber: profile.policy_number || "N/A",
+                groupNumber: profile.group_number || "N/A",
+                memberId: profile.member_id || "N/A"
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching profile:", error)
+        // Fallback profile
+        return {
+            id: "unknown",
+            firstName: "Unknown",
+            lastName: "User",
+            email: "No email provided",
+            phone: "No phone provided",
+            dateOfBirth: "Not provided",
+            gender: "Not specified",
+            address: "No address provided",
+            bloodType: "Unknown",
+            height: "Unknown",
+            weight: "Unknown",
+            memberSince: "Unknown",
+            emergencyContacts: [],
+            allergies: [],
+            medicalConditions: [],
+            insurance: {
+                provider: "No insurance provided",
+                policyNumber: "N/A",
+                groupNumber: "N/A",
+                memberId: "N/A"
+            }
         }
     }
 }

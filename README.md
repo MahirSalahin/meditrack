@@ -39,19 +39,11 @@ Built with cutting-edge technology, MediTrack transforms complex medical workflo
 
 ### Development Tools
 - **Package Managers**: pnpm (frontend), pip (backend)
-- **Containerization**: Docker & Docker Compose
 - **Linting**: ESLint (frontend)
 - **Environment**: python-dotenv for environment variables
 
 ## 📋 Prerequisites
 
-Choose one of the following setup methods:
-
-### Option 1: Docker Setup (Recommended - Easiest)
-- **Docker** and **Docker Compose**
-- **Git**
-
-### Option 2: Local Development Setup
 - **Node.js** (v18 or later)
 - **pnpm** (recommended package manager for frontend)
 - **Python** (v3.11 or later)
@@ -60,84 +52,6 @@ Choose one of the following setup methods:
 - **Git**
 
 ## 🚀 Getting Started
-
-### Option 1: Docker Setup (Recommended) 🐳
-
-This is the easiest way to get Meditrack running with minimal setup.
-
-#### 1. Clone the Repository
-
-```bash
-git clone https://github.com/MahirSalahin/meditrack.git
-cd meditrack
-```
-
-#### 2. Create Environment Files
-
-**Backend Environment (.env in backend folder):**
-```bash
-# Create backend .env file
-touch backend/.env
-```
-
-Add the following to `backend/.env`:
-```env
-DATABASE_URL=postgresql://postgres:admin@db:5432/meditrack
-SECRET_KEY=your-super-secret-key-here-make-it-long-and-random
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=300000000
-BACKEND_URL=http://localhost:8000
-BACKEND_CORS_ORIGINS=http://localhost:3000
-DATABASE_HOST=db
-DATABASE_PORT=5432
-DATABASE_USER=postgres
-DATABASE_PASSWORD=admin
-```
-
-**Frontend Environment (.env.local in frontend folder):**
-```bash
-# Create frontend .env.local file
-touch frontend/.env.local
-```
-
-Add the following to `frontend/.env.local`:
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=1mfjv+1FrbRHWsZKvaPIS1NL4To2zS6TumsrxCJdXAk=
-AUTH_SECRET=1mfjv+1FrbRHWsZKvaPIS1NL4To2zS6TumsrxCJdXAk=
-```
-
-#### 3. Run with Docker Compose
-
-```bash
-# Build and start all services
-docker-compose up --build
-
-# Or run in background
-docker-compose up --build -d
-```
-
-#### 4. Access the Application
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-- **Database**: localhost:5432 (postgres/admin)
-
-#### 5. Stop the Application
-
-```bash
-# Stop all services
-docker-compose down
-
-# Stop and remove volumes (clears database)
-docker-compose down -v
-```
-
----
-
-### Option 2: Local Development Setup 💻
 
 #### 1. Clone the Repository
 
@@ -264,46 +178,15 @@ cd meditrack
 4. **Start the development server**:
    ```bash
    pnpm dev
-   
-   # Or with npm:
-   npm run dev
    ```
 
    The frontend will be available at `http://localhost:3000`
 
+   **Note**: `pnpm dev` is the primary command to run the frontend. If you don't have pnpm, you can install it with `npm install -g pnpm` or alternatively use `npm run dev`.
+
 ## 🔧 Development Commands
 
-### Docker Commands
-
-```bash
-# Start all services
-docker-compose up
-
-# Start with rebuild
-docker-compose up --build
-
-# Start in background
-docker-compose up -d
-
-# Stop all services
-docker-compose down
-
-# View logs
-docker-compose logs
-
-# View specific service logs
-docker-compose logs backend
-docker-compose logs frontend
-
-# Restart specific service
-docker-compose restart backend
-
-# Execute commands in running container
-docker-compose exec backend bash
-docker-compose exec frontend sh
-```
-
-### Backend Commands (Local Development)
+### Backend Commands
 
 ```bash
 # Activate virtual environment first
@@ -328,10 +211,10 @@ python scripts/seed_admin.py
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Frontend Commands (Local Development)
+### Frontend Commands
 
 ```bash
-# Start development server
+# Start development server (Primary command)
 pnpm dev
 
 # Build for production
@@ -346,7 +229,7 @@ pnpm lint
 # Install new package
 pnpm add package-name
 
-# Using npm instead of pnpm:
+# Alternative commands (if not using pnpm):
 npm run dev
 npm run build
 npm start
@@ -374,8 +257,6 @@ meditrack/
 │   ├── scripts/               # Utility scripts
 │   ├── uploads/               # File uploads directory
 │   ├── requirements.txt       # Python dependencies
-│   ├── Dockerfile            # Docker configuration
-│   ├── entrypoint.sh         # Docker entrypoint script
 │   └── alembic.ini           # Alembic configuration
 │
 ├── frontend/                   # Next.js frontend application
@@ -387,10 +268,8 @@ meditrack/
 │   │   └── types/             # TypeScript type definitions
 │   ├── public/                # Static assets
 │   ├── package.json           # Node.js dependencies
-│   ├── Dockerfile            # Docker configuration
 │   └── next.config.ts         # Next.js configuration
 │
-├── docker-compose.yml          # Docker Compose configuration
 └── README.md                   # Project documentation
 ```
 
@@ -428,35 +307,7 @@ JWT tokens are used for authentication with configurable expiration times.
 
 ## 🐛 Troubleshooting
 
-### Docker Issues
-
-1. **Port Already in Use**:
-   ```bash
-   # Check what's using the port
-   lsof -i :3000  # or :8000, :5432
-   
-   # Kill the process or use different ports in docker-compose.yml
-   ```
-
-2. **Docker Build Fails**:
-   ```bash
-   # Clean up Docker cache
-   docker system prune -a
-   
-   # Rebuild without cache
-   docker-compose build --no-cache
-   ```
-
-3. **Permission Denied (entrypoint.sh)**:
-   ```bash
-   # Make script executable
-   chmod +x backend/entrypoint.sh
-   
-   # Then rebuild
-   docker-compose up --build
-   ```
-
-### Local Development Issues
+### Common Development Issues
 
 1. **Database Connection Error**:
    - Verify PostgreSQL is running
@@ -564,8 +415,9 @@ For support and questions:
 
 1. **Clone the repo**: `git clone https://github.com/MahirSalahin/meditrack.git`
 2. **Enter directory**: `cd meditrack`
-3. **Create environment files** (see Docker setup section above)
-4. **Run with Docker**: `docker-compose up --build`
-5. **Visit**: http://localhost:3000
+3. **Setup database**: Create PostgreSQL database and configure environment files
+4. **Setup backend**: Navigate to backend, create venv, install dependencies, run migrations
+5. **Setup frontend**: Navigate to frontend, run `pnpm install`, then `pnpm dev`
+6. **Visit**: http://localhost:3000
 
-That's
+**Note**: Use `pnpm dev` as the primary command to run the frontend development server.

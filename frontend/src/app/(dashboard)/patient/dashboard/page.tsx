@@ -14,8 +14,10 @@ import {
   AppointmentCardSkeleton,
   MedicationCardSkeleton,
 } from "@/components/skeletons/patient/dashboard.skeleton"
+import { useProfile } from "@/lib/api/profile.service"
 
 export default function PatientDashboard() {
+  const { data: profile } = useProfile()
   const { data: healthMetrics, isLoading: healthLoading } = useHealthMetrics()
   const { data: appointments, isLoading: appointmentsLoading } = usePatientAppointments()
   const { data: medications, isLoading: medicationsLoading } = usePatientMedications()
@@ -33,17 +35,15 @@ export default function PatientDashboard() {
     }
   }
 
+  const userName = profile?.user?.full_name || profile?.user?.first_name || "Patient"
+
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
       <div className={`bg-primary rounded-2xl p-8 text-white relative overflow-hidden`}>
         <div className="relative z-10">
           <h1 className="text-3xl font-bold mb-2">Welcome back 👋</h1>
-          <h2 className="text-2xl font-semibold mb-4">John Doe</h2>
-          <p className="text-white/80 text-lg mb-6 max-w-md">
-            If you are going to use a passage of Lorem Ipsum, you need to be sure there isn&#39;t anything.
-          </p>
-          <Button className="bg-white/20 hover:bg-white/30 text-white border-white/30">Go now</Button>
+          <h2 className="text-2xl font-semibold mb-4">{userName}</h2>
         </div>
         <div className="absolute right-8 top-1/2 transform -translate-y-1/2">
           <div className="w-32 h-32 bg-white/10 rounded-full flex items-center justify-center">

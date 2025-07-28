@@ -341,12 +341,20 @@ async def get_doctor_patients(
                 detail="Only doctors can access patient lists",
             )
 
+        # Get doctor profile to use the correct doctor_id
+        doctor_profile = get_doctor_profile_by_user_id(current_user.id)
+        if not doctor_profile:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Doctor profile not found",
+            )
+
         # Calculate offset
         offset = (page - 1) * page_size
 
         # Get patients
         patients, total_count = get_all_patients_for_doctor(
-            doctor_id=current_user.id,
+            doctor_id=doctor_profile.id,  # Use doctor profile ID, not user ID
             limit=page_size,
             offset=offset,
         )
@@ -396,12 +404,20 @@ async def search_doctor_patients(
                 detail="Only doctors can search patients",
             )
 
+        # Get doctor profile to use the correct doctor_id
+        doctor_profile = get_doctor_profile_by_user_id(current_user.id)
+        if not doctor_profile:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Doctor profile not found",
+            )
+
         # Calculate offset
         offset = (page - 1) * page_size
 
         # Search patients
         patients, total_count = search_patients_for_doctor(
-            doctor_id=current_user.id,
+            doctor_id=doctor_profile.id,  # Use doctor profile ID, not user ID
             search_term=search_term,
             limit=page_size,
             offset=offset,

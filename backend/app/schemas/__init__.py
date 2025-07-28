@@ -59,6 +59,14 @@ from .medications import (
     MedicationLogWithDetails
 )
 
+from .health_metrics import (
+    HealthMetricCreate,
+    HealthMetricUpdate,
+    HealthMetricRead,
+    HealthMetricStats,
+    HealthMetricSearchFilters,
+)
+
 # Import enums from models
 from app.models.enums import UserType, BloodGroup, Gender, AppointmentStatus, AppointmentType, MedicationStatus, PrescriptionStatus
 
@@ -107,6 +115,13 @@ __all__ = [
     "MedicationLogUpdate",
     "MedicationLogRead",
     "MedicationLogWithDetails",
+    
+    # Health Metrics schemas
+    "HealthMetricCreate",
+    "HealthMetricUpdate", 
+    "HealthMetricRead",
+    "HealthMetricStats",
+    "HealthMetricSearchFilters",
     
     # Auth schemas
     "Token",

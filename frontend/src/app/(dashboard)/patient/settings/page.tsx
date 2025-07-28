@@ -13,35 +13,6 @@ export default function SettingsPage() {
             <TitleHeader
                 title="Settings"
             />
-
-            {/* Profile Settings */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Profile Settings</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="firstName">First Name</Label>
-                            <Input id="firstName" placeholder="Enter your first name" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="lastName">Last Name</Label>
-                            <Input id="lastName" placeholder="Enter your last name" />
-                        </div>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" placeholder="Enter your email" />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input id="phone" type="tel" placeholder="Enter your phone number" />
-                    </div>
-                    <Button className="mt-4">Save Changes</Button>
-                </CardContent>
-            </Card>
-
             {/* Notification Preferences */}
             <Card>
                 <CardHeader>

@@ -7,6 +7,7 @@ from app.api.routes import (
     medical_conditions_router,
     medical_records,
 )
+from app.api.routes.health_metrics import router as health_metrics_router
 
 api_router = APIRouter()
 api_router.include_router(auth_router, prefix="/auth", tags=["Authentication"])
@@ -20,4 +21,7 @@ api_router.include_router(
 )
 api_router.include_router(
     medical_records.router, prefix="/records", tags=["Medical Records"]
+)
+api_router.include_router(
+    health_metrics_router, tags=["Health Metrics"]
 )

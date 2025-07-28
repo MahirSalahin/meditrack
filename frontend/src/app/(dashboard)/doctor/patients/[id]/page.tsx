@@ -420,38 +420,6 @@ export default function PatientDetailPage() {
                     </Card>
                 </TabsContent>
             </Tabs>
-
-            {/* Quick Actions */}
-            <Card className="shadow-sm">
-                <CardHeader>
-                    <CardTitle>Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <Button variant="outline" className="h-auto flex-col py-4">
-                            <Calendar className="h-6 w-6 mb-2" />
-                            Schedule Appointment
-                        </Button>
-                        <Button variant="outline" className="h-auto flex-col py-4">
-                            <FileText className="h-6 w-6 mb-2" />
-                            Add Medical Record
-                        </Button>
-                        <AddPrescriptionDialog
-                            patient={patient}
-                            trigger={
-                                <Button variant="outline" className="h-auto flex-col py-4">
-                                    <Pill className="h-6 w-6 mb-2" />
-                                    Prescribe Medication
-                                </Button>
-                            }
-                        />
-                        <Button variant="outline" className="h-auto flex-col py-4">
-                            <Mail className="h-6 w-6 mb-2" />
-                            Send Message
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
         </div>
     )
 }

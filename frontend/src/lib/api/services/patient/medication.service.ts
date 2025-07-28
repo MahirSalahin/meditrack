@@ -1,118 +1,87 @@
-import { wait } from "@/lib/wait"
+import axiosInstance from "@/lib/axios-interceptor"
 import { MedicationDetails, UpcomingDose, MedicationStats } from "./types"
 import { useQuery } from "@tanstack/react-query"
 
-// Separate data fetching functions for each component
+// API function for quick actions data
 const getQuickActionsData = async (): Promise<{
     nextDose: { name: string; timeLeft: string }
     takenToday: string
     missedCount: number
 }> => {
-    await wait(500)
-    return {
-        nextDose: {
-            name: "Lisinopril",
-            timeLeft: "2 hours"
-        },
-        takenToday: "26/28",
-        missedCount: 1
+    try {
+        // TODO: Implement real API call for medication quick actions
+        // For now, return default data since this specific endpoint doesn't exist
+        return {
+            nextDose: {
+                name: "No upcoming doses",
+                timeLeft: "N/A"
+            },
+            takenToday: "0/0",
+            missedCount: 0
+        }
+    } catch (error) {
+        console.error("Error fetching quick actions:", error)
+        return {
+            nextDose: { name: "Error loading", timeLeft: "N/A" },
+            takenToday: "0/0",
+            missedCount: 0
+        }
     }
 }
 
 const getMedicationsListData = async (): Promise<MedicationDetails[]> => {
-    await wait(700)
-    return [
-        {
-            id: "1",
-            name: "Lisinopril",
-            genericName: "Lisinopril",
-            dosage: "10mg",
-            frequency: "Once daily",
-            nextDose: "8:00 AM",
-            timeLeft: "2 hours",
-            color: "bg-blue-500",
-            status: "active",
-            prescribedBy: "Dr. Sarah Johnson",
-            startDate: "2024-01-01",
-            endDate: "2024-06-01",
-            instructions: "Take with food. Monitor blood pressure.",
-            sideEffects: "Dizziness, dry cough",
-            refillsLeft: 3,
-            pharmacy: "CVS Pharmacy",
-        },
-        {
-            id: "2",
-            name: "Metformin",
-            genericName: "Metformin HCl",
-            dosage: "500mg",
-            frequency: "Twice daily",
-            nextDose: "6:00 PM",
-            timeLeft: "8 hours",
-            color: "bg-green-500",
-            status: "active",
-            prescribedBy: "Dr. Michael Chen",
-            startDate: "2023-12-15",
-            endDate: "2024-12-15",
-            instructions: "Take with meals to reduce stomach upset.",
-            sideEffects: "Nausea, stomach upset",
-            refillsLeft: 5,
-            pharmacy: "Walgreens",
-        },
-        {
-            id: "3",
-            name: "Vitamin D3",
-            genericName: "Cholecalciferol",
-            dosage: "1000 IU",
-            frequency: "Once daily",
-            nextDose: "Tomorrow 8:00 AM",
-            timeLeft: "14 hours",
-            color: "bg-orange-500",
-            status: "active",
-            prescribedBy: "Dr. Sarah Johnson",
-            startDate: "2024-01-10",
-            endDate: "2024-07-10",
-            instructions: "Take with fatty meal for better absorption.",
-            sideEffects: "Rare: nausea, vomiting",
-            refillsLeft: 2,
-            pharmacy: "CVS Pharmacy",
-        },
-        {
-            id: "4",
-            name: "Aspirin",
-            genericName: "Acetylsalicylic acid",
-            dosage: "81mg",
-            frequency: "Once daily",
-            nextDose: "Missed - 8:00 AM",
-            timeLeft: "Overdue",
-            color: "bg-red-500",
-            status: "missed",
-            prescribedBy: "Dr. Sarah Johnson",
-            startDate: "2023-11-01",
-            endDate: "Ongoing",
-            instructions: "Take with food to prevent stomach irritation.",
-            sideEffects: "Stomach upset, bleeding risk",
-            refillsLeft: 1,
-            pharmacy: "CVS Pharmacy",
-        },
-    ]
+    try {
+        const response = await axiosInstance.get("/medications/my/list-items")
+        const medications = response.data?.medications || []
+
+        return medications.map((med: any) => ({
+            id: med.id,
+            name: med.medication_name,
+            genericName: med.medication_name, // Using same as name since generic not available
+            dosage: med.dosage,
+            frequency: med.frequency,
+            nextDose: "Next dose TBD", // TODO: Calculate next dose time
+            timeLeft: "TBD", // TODO: Calculate time remaining
+            color: "bg-blue-500", // Default color
+            status: "active", // Default status
+            prescribedBy: med.doctor?.name || "Dr. Unknown",
+            startDate: med.prescribed_date || "Unknown",
+            endDate: "TBD", // Not available in current schema
+            instructions: med.instructions || "No instructions provided",
+            sideEffects: "Consult doctor", // Not available in current schema
+            refillsLeft: 0, // Not available in current schema
+            pharmacy: "TBD", // Not available in current schema
+        }))
+    } catch (error) {
+        console.error("Error fetching medications list:", error)
+        return []
+    }
 }
 
 const getTodayScheduleData = async (): Promise<UpcomingDose[]> => {
-    await wait(300)
-    return [
-        { medication: "Lisinopril", time: "8:00 AM", status: "upcoming" },
-        { medication: "Metformin", time: "6:00 PM", status: "upcoming" },
-        { medication: "Vitamin D3", time: "8:00 AM Tomorrow", status: "scheduled" },
-    ]
+    // TODO: Implement real API call for today's medication schedule
+    return []
 }
 
 const getMedicationStatsData = async (): Promise<MedicationStats> => {
-    await wait(400)
-    return {
-        activeMedications: 4,
-        adherenceRate: "92%",
-        dosesThisWeek: "26/28",
-        refillsNeeded: 2,
+    try {
+        const response = await axiosInstance.get("/medications/my/stats")
+        const stats = response.data
+
+        return {
+            activeMedications: stats.active_medications || 0,
+            adherenceRate: `${stats.adherence_rate || 0}%`,
+            dosesThisWeek: `${stats.doses_taken_this_week || 0}/${stats.total_doses_this_week || 0}`,
+            refillsNeeded: stats.refills_needed || 0,
+        }
+    } catch (error) {
+        console.error("Error fetching medication stats:", error)
+        return {
+            activeMedications: 0,
+            adherenceRate: "0%",
+            dosesThisWeek: "0/0",
+            refillsNeeded: 0,
+        }
     }
 }
 

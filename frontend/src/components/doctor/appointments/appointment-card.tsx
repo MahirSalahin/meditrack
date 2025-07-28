@@ -9,6 +9,7 @@ import { useUpdateAppointment, useDeleteAppointment } from '@/lib/api/appointmen
 import { AppointmentReminders } from '@/components/appointment-reminders'
 import { CancelConfirmationDialog } from '@/components/confirmation-dialog'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 interface DoctorAppointmentCardProps {
     appointment: AppointmentWithDetails
@@ -18,6 +19,13 @@ export default function DoctorAppointmentCard({ appointment }: DoctorAppointment
     const [showCancelDialog, setShowCancelDialog] = useState(false)
     const updateAppointment = useUpdateAppointment()
     const deleteAppointment = useDeleteAppointment()
+    const router = useRouter()
+
+    const handlePatientClick = () => {
+        if (appointment.patient_id) {
+            router.push(`/doctor/patients/${appointment.patient_id}`)
+        }
+    }
 
     const getStatusVariant = (status: AppointmentStatus) => {
         switch (status) {
@@ -107,7 +115,10 @@ export default function DoctorAppointmentCard({ appointment }: DoctorAppointment
                 <CardContent className="p-6">
                     {/* Header with Patient Info and Status */}
                     <div className="flex items-start justify-between mb-4">
-                        <div className="flex items-start space-x-4">
+                        <div 
+                            className="flex items-start space-x-4 cursor-pointer hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors flex-1"
+                            onClick={handlePatientClick}
+                        >
                             <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                                 <span className="text-lg font-semibold text-primary">
                                     {getPatientInitials(appointment.patient_name)}
@@ -115,7 +126,7 @@ export default function DoctorAppointmentCard({ appointment }: DoctorAppointment
                             </div>
                             <div>
                                 <div className="flex items-center space-x-3 mb-2">
-                                    <h3 className="text-lg font-semibold">
+                                    <h3 className="text-lg font-semibold hover:text-primary transition-colors">
                                         {appointment.patient_name || "Patient Name Not Available"}
                                     </h3>
                                     <Badge variant={getStatusVariant(appointment.status)}>
@@ -136,59 +147,6 @@ export default function DoctorAppointmentCard({ appointment }: DoctorAppointment
                                     {appointment.reason || 'No reason provided'}
                                 </p>
                             </div>
-                        </div>
-                        <div className="flex space-x-2">
-                            {/* Reminders Component */}
-                            <AppointmentReminders
-                                appointmentId={appointment.id}
-                                appointmentDate={appointment.appointment_date}
-                                variant="badge"
-                            />
-
-                            {/* Status Update Buttons */}
-                            {appointment.status === AppointmentStatus.SCHEDULED && (
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleStatusUpdate(AppointmentStatus.CONFIRMED)}
-                                    disabled={updateAppointment.isPending}
-                                >
-                                    <CheckCircle className="h-4 w-4 mr-2" />
-                                    Confirm
-                                </Button>
-                            )}
-                            {appointment.status === AppointmentStatus.CONFIRMED && (
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleStatusUpdate(AppointmentStatus.IN_PROGRESS)}
-                                    disabled={updateAppointment.isPending}
-                                >
-                                    <Clock className="h-4 w-4 mr-2" />
-                                    Start
-                                </Button>
-                            )}
-                            {appointment.status === AppointmentStatus.IN_PROGRESS && (
-                                <Button
-                                    size="sm"
-                                    onClick={() => handleStatusUpdate(AppointmentStatus.COMPLETED)}
-                                    disabled={updateAppointment.isPending}
-                                >
-                                    <CheckCircle className="h-4 w-4 mr-2" />
-                                    Complete
-                                </Button>
-                            )}
-                            {/* Show Cancel button only if not cancelled */}
-                            {appointment.status !== AppointmentStatus.CANCELLED && (
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => setShowCancelDialog(true)}
-                                >
-                                    <Trash2 className="h-4 w-4 mr-2" />
-                                    Cancel
-                                </Button>
-                            )}
                         </div>
                     </div>
 

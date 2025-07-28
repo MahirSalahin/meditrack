@@ -1,5 +1,4 @@
 import axiosInstance from "@/lib/axios-interceptor"
-import { wait } from "@/lib/wait"
 import { BookmarkPatient, PatientProfileForDoctor } from "@/types"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
@@ -40,155 +39,153 @@ export interface SearchFilters {
 }
 
 const getPatientsData = async (): Promise<Patient[]> => {
-    await wait(800)
-    return [
-        {
-            id: "PAT001",
-            name: "John Smith",
-            age: 45,
-            gender: "Male",
-            lastVisit: "2024-02-15",
-            nextAppointment: "2024-03-15",
-            condition: "Hypertension",
-            status: "stable",
-            bloodType: "O+",
-            allergies: ["Penicillin", "Shellfish"],
-            medications: ["Lisinopril", "Metformin"],
+    try {
+        const response = await axiosInstance.get("/profiles/doctors/patients")
+        const patients = response.data?.patients || []
+        
+        return patients.map((patient: any) => ({
+            id: patient.id,
+            name: patient.name,
+            age: patient.age || 0,
+            gender: patient.gender || "Unknown",
+            lastVisit: patient.last_visit || "Unknown",
+            nextAppointment: "TBD", // Not available in current schema
+            condition: patient.medical_history || "No condition listed",
+            status: "stable", // Default status since not available
+            bloodType: patient.blood_group || "Unknown",
+            allergies: patient.allergies || [],
+            medications: [], // Would need separate API call
             contact: {
-                email: "john.smith@email.com",
-                phone: "(555) 123-4567"
+                email: patient.email || "No email",
+                phone: patient.phone || "No phone"
             },
-            isBookmarked: true
-        },
-        {
-            id: "PAT002",
-            name: "Sarah Johnson",
-            age: 32,
-            gender: "Female",
-            lastVisit: "2024-02-20",
-            nextAppointment: "2024-03-01",
-            condition: "Type 2 Diabetes",
-            status: "monitoring",
-            bloodType: "A+",
-            allergies: ["Latex"],
-            medications: ["Metformin", "Insulin"],
-            contact: {
-                email: "sarah.j@email.com",
-                phone: "(555) 234-5678"
-            },
-            isBookmarked: false
-        },
-        {
-            id: "PAT003",
-            name: "Michael Brown",
-            age: 58,
-            gender: "Male",
-            lastVisit: "2024-02-18",
-            nextAppointment: "2024-02-25",
-            condition: "Heart Disease",
-            status: "critical",
-            bloodType: "B-",
-            allergies: ["Aspirin"],
-            medications: ["Atorvastatin", "Aspirin"],
-            contact: {
-                email: "michael.b@email.com",
-                phone: "(555) 345-6789"
-            },
-            isBookmarked: true
-        },
-        {
-            id: "PAT004",
-            name: "Emily Davis",
-            age: 29,
-            gender: "Female",
-            lastVisit: "2024-02-10",
-            nextAppointment: "2024-03-10",
-            condition: "Asthma",
-            status: "stable",
-            bloodType: "AB+",
-            allergies: ["Dust", "Pollen"],
-            medications: ["Albuterol", "Fluticasone"],
-            contact: {
-                email: "emily.d@email.com",
-                phone: "(555) 456-7890"
-            },
-            isBookmarked: false
-        },
-        {
-            id: "PAT005",
-            name: "Robert Wilson",
-            age: 50,
-            gender: "Male",
-            lastVisit: "2024-02-22",
-            nextAppointment: "2024-03-22",
-            condition: "Arthritis",
-            status: "monitoring",
-            bloodType: "O-",
-            allergies: ["Ibuprofen"],
-            medications: ["Methotrexate", "Folic Acid"],
-            contact: {
-                email: "robert.w@email.com",
-                phone: "(555) 567-8901"
-            },
-            isBookmarked: false
-        }
-    ]
+            isBookmarked: patient.is_bookmarked || false
+        }))
+    } catch (error) {
+        console.error("Error fetching patients:", error)
+        return []
+    }
 }
 
 const getPatientStatsData = async (): Promise<PatientStats> => {
-    await wait(500)
-    return {
-        total: 156,
-        stable: 98,
-        monitoring: 45,
-        critical: 13,
-        newThisMonth: 8,
-        bookmarked: 2
+    try {
+        // Instead of fetching all patients, return basic stats
+        // TODO: Replace with dedicated stats API endpoint when available
+        return {
+            total: 0, // Will be updated when real stats API is available
+            stable: 0,
+            monitoring: 0,
+            critical: 0,
+            newThisMonth: 0,
+            bookmarked: 0
+        }
+    } catch (error) {
+        console.error("Error fetching patient stats:", error)
+        return {
+            total: 0,
+            stable: 0,
+            monitoring: 0,
+            critical: 0,
+            newThisMonth: 0,
+            bookmarked: 0
+        }
     }
 }
 
 // Search patient by ID
 const searchPatientById = async (patientId: string): Promise<Patient | null> => {
-    await wait(600)
-    const patients = await getPatientsData()
-    const patient = patients.find(p => p.id.toLowerCase() === patientId.toLowerCase())
-    return patient || null
+    try {
+        const response = await axiosInstance.get(`/profiles/patients/${patientId}`)
+        const patient = response.data
+        
+        // Transform to match Patient interface
+        return {
+            id: patient.id,
+            name: patient.name,
+            age: patient.age || 0,
+            gender: patient.gender || "Unknown",
+            lastVisit: patient.last_visit || "Unknown",
+            nextAppointment: "TBD",
+            condition: patient.medical_history || "No condition listed",
+            status: "stable",
+            bloodType: patient.blood_group || "Unknown",
+            allergies: patient.allergies || [],
+            medications: [],
+            contact: {
+                email: patient.email || "No email",
+                phone: patient.phone || "No phone"
+            },
+            isBookmarked: patient.is_bookmarked || false
+        }
+    } catch (error) {
+        console.error("Error searching patient:", error)
+        return null
+    }
 }
 
 // Get patient by ID for detailed view
 const getPatientById = async (patientId: string): Promise<Patient | null> => {
-    await wait(400)
-    const patients = await getPatientsData()
-    const patient = patients.find(p => p.id === patientId)
-    return patient || null
+    // Use the same API as searchPatientById
+    return searchPatientById(patientId)
 }
 
 // Get bookmarked patients
 const getBookmarkedPatients = async (): Promise<Patient[]> => {
-    await wait(500)
-    const patients = await getPatientsData()
-    return patients.filter(p => p.isBookmarked)
+    try {
+        const response = await axiosInstance.get("/profiles/bookmark")
+        const patients = response.data?.patients || []
+        
+        return patients.map((patient: any) => ({
+            id: patient.id,
+            name: patient.name,
+            age: patient.age || 0,
+            gender: patient.gender || "Unknown",
+            lastVisit: patient.last_visit || "Unknown",
+            nextAppointment: "TBD",
+            condition: patient.medical_history || "No condition listed",
+            status: "stable",
+            bloodType: patient.blood_group || "Unknown",
+            allergies: patient.allergies || [],
+            medications: [],
+            contact: {
+                email: patient.email || "No email",
+                phone: patient.phone || "No phone"
+            },
+            isBookmarked: true // These are all bookmarked patients
+        }))
+    } catch (error) {
+        console.error("Error fetching bookmarked patients:", error)
+        return []
+    }
 }
 
 // Toggle bookmark status
-const toggleBookmark = async (): Promise<{ success: boolean }> => {
-    await wait(300)
-    // In a real app, this would make an API call to update the bookmark status
-    return { success: true }
+const toggleBookmark = async (patientId: string): Promise<{ success: boolean }> => {
+    try {
+        await axiosInstance.post(`/profiles/bookmark/${patientId}/toggle`)
+        return { success: true }
+    } catch (error) {
+        console.error("Error toggling bookmark:", error)
+        return { success: false }
+    }
 }
 
 // Filter patients
 const filterPatients = async (filters: SearchFilters): Promise<Patient[]> => {
-    await wait(400)
-    const patients = await getPatientsData()
+    try {
+        const patients = await getPatientsData()
 
-    return patients.filter(patient => {
-        if (filters.showBookmarkedOnly && !patient.isBookmarked) return false
-        if (filters.name && !patient.name.toLowerCase().includes(filters.name.toLowerCase())) return false
-        if (filters.status && patient.status !== filters.status) return false
-        if (filters.condition && !patient.condition.toLowerCase().includes(filters.condition.toLowerCase())) return false
-        return true
-    })
+        return patients.filter(patient => {
+            if (filters.showBookmarkedOnly && !patient.isBookmarked) return false
+            if (filters.name && !patient.name.toLowerCase().includes(filters.name.toLowerCase())) return false
+            if (filters.status && patient.status !== filters.status) return false
+            if (filters.condition && !patient.condition.toLowerCase().includes(filters.condition.toLowerCase())) return false
+            return true
+        })
+    } catch (error) {
+        console.error("Error filtering patients:", error)
+        return []
+    }
 }
 
 // Service object for direct API calls
@@ -203,10 +200,11 @@ export const patientsService = {
 }
 
 // React Query hooks
-export const usePatients = () => {
+export const usePatients = (enabled: boolean = false) => {
     return useQuery({
         queryKey: ["patients"],
-        queryFn: patientsService.getPatients
+        queryFn: patientsService.getPatients,
+        enabled // Only fetch when explicitly enabled
     })
 }
 

@@ -1,129 +1,72 @@
 import { Appointment } from "@/lib/api/services/patient/types"
-import { wait } from "@/lib/wait"
+import axiosInstance from "@/lib/axios-interceptor"
 import { useQuery } from "@tanstack/react-query"
 
-// Static data functions
+// API function to get appointments
 const getAppointmentsData = async (): Promise<Appointment[]> => {
-    await wait(600)
-    return [
-        {
-            id: "APT001",
-            doctor: "Dr. Sarah Johnson",
-            specialty: "Cardiology",
-            date: "2024-01-25",
-            time: "10:00 AM",
-            duration: "30 minutes",
-            type: "Follow-up",
-            status: "confirmed",
-            location: "City Medical Center",
-            address: "123 Medical Drive, Suite 200",
-            phone: "(555) 123-4567",
-            appointmentType: "in-person",
-            reason: "Blood pressure follow-up",
-            notes: "Bring current medication list",
-            insurance: "Covered by Blue Cross",
-            copay: "$25",
-        },
-        {
-            id: "APT002",
-            doctor: "Dr. Michael Chen",
-            specialty: "Endocrinology",
-            date: "2024-01-30",
-            time: "2:30 PM",
-            duration: "45 minutes",
-            type: "Consultation",
-            status: "confirmed",
-            location: "Diabetes Care Center",
-            address: "456 Health Plaza, Floor 3",
-            phone: "(555) 234-5678",
-            appointmentType: "in-person",
-            reason: "Diabetes management review",
-            notes: "Fasting required - no food 12 hours before",
-            insurance: "Covered by Blue Cross",
-            copay: "$40",
-        },
-        {
-            id: "APT003",
-            doctor: "Dr. Emily Rodriguez",
-            specialty: "Dermatology",
-            date: "2024-02-05",
-            time: "11:15 AM",
-            duration: "20 minutes",
-            type: "Check-up",
-            status: "pending",
-            location: "Skin Health Clinic",
-            address: "789 Wellness Blvd",
-            phone: "(555) 345-6789",
-            appointmentType: "in-person",
-            reason: "Annual skin cancer screening",
-            notes: "Wear comfortable clothing",
-            insurance: "Covered by Blue Cross",
-            copay: "$30",
-        },
-        {
-            id: "APT004",
-            doctor: "Dr. Robert Wilson",
-            specialty: "Cardiology",
-            date: "2024-02-10",
-            time: "9:00 AM",
-            duration: "60 minutes",
-            type: "Procedure",
-            status: "confirmed",
-            location: "Heart Institute",
-            address: "321 Cardiac Way",
-            phone: "(555) 456-7890",
-            appointmentType: "in-person",
-            reason: "Stress test",
-            notes: "Wear comfortable shoes and clothing. No caffeine 24 hours before.",
-            insurance: "Pre-authorization required",
-            copay: "$75",
-        },
-        {
-            id: "APT005",
-            doctor: "Dr. Lisa Park",
-            specialty: "Family Medicine",
-            date: "2024-01-20",
-            time: "3:00 PM",
-            duration: "30 minutes",
-            type: "Telemedicine",
-            status: "completed",
-            location: "Virtual Visit",
-            address: "Online",
-            phone: "(555) 567-8901",
-            appointmentType: "virtual",
-            reason: "Cold symptoms consultation",
-            notes: "Prescription sent to pharmacy",
-            insurance: "Covered by Blue Cross",
-            copay: "$20",
-        },
-    ]
+    try {
+        const response = await axiosInstance.get("/appointments/my/upcoming")
+        return response.data.map((appointment: any) => ({
+            id: appointment.id,
+            doctor: appointment.doctor_name || "Dr. Unknown",
+            specialty: appointment.specialty || "General",
+            date: new Date(appointment.appointment_date).toISOString().split('T')[0],
+            time: new Date(appointment.appointment_date).toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            }),
+            duration: "30 minutes", // Default duration, not available in current schema
+            type: appointment.appointment_type || "General",
+            status: appointment.status,
+            location: appointment.location || "Medical Center",
+            address: appointment.address || "Address not provided",
+            phone: appointment.phone || "Phone not provided",
+            appointmentType: "in-person", // Default, not available in current schema
+            reason: appointment.reason || "No reason provided",
+            notes: appointment.notes || "No additional notes",
+            insurance: "To be determined", // Not available in current schema
+            copay: "To be determined", // Not available in current schema
+        }))
+    } catch (error) {
+        console.error("Error fetching appointments:", error)
+        return []
+    }
 }
 
 const getUpcomingAppointmentsData = async (): Promise<Appointment[]> => {
-    await wait(500)
-    return [
-        {
-            id: "1",
-            doctor: "Dr. Sarah Johnson",
-            specialty: "Cardiology",
-            date: "2024-01-15",
-            time: "10:00 AM",
-            type: "In-person",
-            status: "confirmed",
-        },
-    ]
+    // Use the same API as the main getAppointmentsData function
+    return getAppointmentsData()
 }
 
 const getAppointmentDetailsData = async (id: string): Promise<Appointment> => {
-    await wait(400)
-    return {
-        id,
-        doctor: "Dr. Sarah Johnson",
-        specialty: "Cardiology",
-        date: "2024-01-15",
-        time: "10:00 AM",
-        type: "In-person",
-        status: "confirmed",
+    try {
+        const response = await axiosInstance.get(`/appointments/${id}`)
+        const appointment = response.data
+        
+        return {
+            id: appointment.id,
+            doctor: appointment.doctor_name || "Dr. Unknown",
+            specialty: appointment.specialty || "General",
+            date: new Date(appointment.appointment_date).toISOString().split('T')[0],
+            time: new Date(appointment.appointment_date).toLocaleTimeString([], { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            }),
+            duration: "30 minutes",
+            type: appointment.appointment_type || "General",
+            status: appointment.status,
+            location: appointment.location || "Medical Center",
+            address: appointment.address || "Address not provided",
+            phone: appointment.phone || "Phone not provided",
+            appointmentType: "in-person",
+            reason: appointment.reason || "No reason provided",
+            notes: appointment.notes || "No additional notes",
+            insurance: "To be determined",
+            copay: "To be determined",
+        }
+    } catch (error) {
+        console.error(`Error fetching appointment ${id}:`, error)
+        throw error
     }
 }
 

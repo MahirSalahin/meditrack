@@ -17,13 +17,11 @@ import {
     UserCheck,
 } from "lucide-react"
 import {
-    usePatientStats,
     useSearchPatient,
     useBookmarkedPatients,
     useToggleBookmark,
 } from "@/lib/api/services/doctor/patients.service"
 import {
-    PatientStatsSkeleton,
     PatientDetailSkeleton,
     BookmarkListSkeleton
 } from "@/components/skeletons/doctor/patients.skeleton"
@@ -133,8 +131,7 @@ export default function PatientsPage() {
     const [bookmarkSearch, setBookmarkSearch] = useState("")
     const [activeTab, setActiveTab] = useState("search")
 
-    // Queries
-    const { data: stats, isLoading: statsLoading } = usePatientStats()
+    // Queries - removed stats query to avoid fetching all patients
     const { data: searchedPatient, isLoading: searchLoading } = useSearchPatient(activePatientId)
     const { data: bookmarkedPatients, isLoading: bookmarkedLoading } = useBookmarkedPatients()
 
@@ -161,52 +158,8 @@ export default function PatientsPage() {
         <div className="container mx-auto px-4 space-y-6">
             <TitleHeader
                 title="Patient Management"
-                description="Search patients by ID and manage your bookmarked patients"
+                description="Search for specific patients by ID and manage your bookmarked patients"
             />
-
-            {/* Stats Cards */}
-            {statsLoading ? (
-                <PatientStatsSkeleton />
-            ) : (
-                <div className="grid gap-4 md:grid-cols-6">
-                    <Card className="border-l-4 border-l-blue-500">
-                        <CardContent className="p-4">
-                            <p className="text-xs text-muted-foreground">Total Patients</p>
-                            <p className="text-2xl font-bold text-foreground">{stats?.total}</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-l-4 border-l-green-500">
-                        <CardContent className="p-4">
-                            <p className="text-xs text-muted-foreground">Stable</p>
-                            <p className="text-2xl font-bold text-green-600">{stats?.stable}</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-l-4 border-l-yellow-500">
-                        <CardContent className="p-4">
-                            <p className="text-xs text-muted-foreground">Monitoring</p>
-                            <p className="text-2xl font-bold text-yellow-600">{stats?.monitoring}</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-l-4 border-l-red-500">
-                        <CardContent className="p-4">
-                            <p className="text-xs text-muted-foreground">Critical</p>
-                            <p className="text-2xl font-bold text-red-600">{stats?.critical}</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-l-4 border-l-blue-500">
-                        <CardContent className="p-4">
-                            <p className="text-xs text-muted-foreground">New This Month</p>
-                            <p className="text-2xl font-bold text-blue-600">{stats?.newThisMonth}</p>
-                        </CardContent>
-                    </Card>
-                    <Card className="border-l-4 border-l-purple-500">
-                        <CardContent className="p-4">
-                            <p className="text-xs text-muted-foreground">Bookmarked</p>
-                            <p className="text-2xl font-bold text-purple-600">{stats?.bookmarked}</p>
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
 
             {/* Main Content */}
             <Tabs value={activeTab} onValueChange={setActiveTab}>
