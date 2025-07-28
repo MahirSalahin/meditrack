@@ -1,11 +1,11 @@
 import os
 import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from fastapi.responses import FileResponse
 
 from app.services import file_service
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fastapi import FastAPI, HTTPException, logger, status
 from fastapi.middleware.cors import CORSMiddleware
 from app.middleware import AuthMiddleware
